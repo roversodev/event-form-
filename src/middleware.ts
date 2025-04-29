@@ -15,9 +15,10 @@ export default withAuth(
 // - /api (rotas de API)
 // - /uploads (arquivos públicos)
 // - /events/:eventId/form (formulário público)
+// - /register (página de registro)
 // - arquivos estáticos (_next/static, _next/image, favicon.ico)
 export const config = {
   matcher: [
-    "/((?!api|uploads|_next/static|_next/image|favicon.ico|events/[^/]+/form|$).*)"
+    "/((?!api|uploads|_next/static|_next/image|favicon.ico|events/[^/]+/form|register|$).*)"
   ],
 }
