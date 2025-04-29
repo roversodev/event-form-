@@ -1,0 +1,375 @@
+'use client';
+
+import React from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { useQuery } from '@tanstack/react-query';
+import { motion } from 'framer-motion';
+import { 
+  ArrowLeft, 
+  Download, 
+  CheckCircle,
+  XCircle,
+  Search,
+  User,
+  Trash2
+} from 'lucide-react';
+import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+import { Skeleton } from '@/components/ui/skeleton';
+import { format } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { toast } from 'sonner';
+
+
+interface FormResponse {
+  id: string;
+  respondentName: string;
+  responses: string;
+  createdAt: string;
+}
+
+interface Event {
+  id: string;
+  title: string;
+  description: string;
+  sections: Array<{
+    id: string;
+    title: string;
+    fields: Array<{
+      id: string;
+      label: string;
+      type: string;
+    }>;
+  }>;
+  responses: FormResponse[];
+}
+
+export default function EventManagement() {
+  const { eventId } = useParams();
+  const router = useRouter();
+  const [searchTerm, setSearchTerm] = React.useState('');
+  const [selectedResponse, setSelectedResponse] = React.useState<FormResponse | null>(null);
+  const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+
+  const { data: event, isLoading } = useQuery<Event>({
+    queryKey: ['event', eventId],
+    queryFn: async () => {
+      const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
+      if (!response.ok) throw new Error('Erro ao carregar evento');
+      return response.json();
+    }
+  });
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <Skeleton className="h-8 w-64 mb-4" />
+        <Skeleton className="h-4 w-96 mb-8" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <p className="text-destructive">Evento não encontrado</p>
+      </div>
+    );
+  }
+
+  const filteredResponses = event.responses.filter(response => 
+    response.respondentName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const handleExportCSV = () => {
+    toast.info('Exportando respostas...');
+    try {
+      // Prepara o cabeçalho do CSV
+      const headers = ['Nome', 'Data de Envio'];
+      event.sections.forEach(section => {
+        section.fields.forEach(field => {
+          headers.push(`${section.title} - ${field.label}`);
+        });
+      });
+  
+      // Prepara as linhas de dados
+      const rows = filteredResponses.map(response => {
+        const row = [];
+        
+        // Adiciona nome e data
+        row.push(
+          response.respondentName,
+          format(new Date(response.createdAt), "dd/MM/yyyy HH:mm:ss")
+        );
+  
+        // Parse as respostas
+        const parsedResponses = JSON.parse(response.responses);
+        
+        // Adiciona cada resposta em sua própria coluna
+        event.sections.forEach(section => {
+          section.fields.forEach(field => {
+            const value = parsedResponses[field.id];
+            const formattedValue = Array.isArray(value) 
+              ? value.join('; ') 
+              : value || '';
+            row.push(formattedValue);
+          });
+        });
+  
+        return row;
+      });
+  
+      // Converte para formato CSV com BOM para suporte adequado a caracteres especiais
+      const BOM = '\uFEFF';
+      const csvContent = BOM + [
+        headers.join(','),
+        ...rows.map(row => 
+          row.map(cell => 
+            `"${String(cell).replace(/"/g, '""')}"`
+          ).join(',')
+        )
+      ].join('\n');
+  
+      // Cria o blob e faz o download
+      const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
+      const link = document.createElement('a');
+      const url = URL.createObjectURL(blob);
+      
+      link.setAttribute('href', url);
+      link.setAttribute('download', `${event.title}_respostas.csv`);
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  
+      toast.success('Respostas exportadas com sucesso!');
+    } catch (error) {
+      console.error('Erro ao exportar CSV:', error);
+      toast.error('Erro ao exportar respostas. Tente novamente.');
+    }
+  };
+
+  const handleViewDetails = (response: FormResponse) => {
+    setSelectedResponse(response);
+  };
+
+  const handleCloseDialog = () => {
+    setSelectedResponse(null);
+  };
+
+  const formatResponseData = (responseData: string) => {
+    try {
+      const parsedData = JSON.parse(responseData);
+      return event?.sections.map(section => {
+        const sectionFields = section.fields.map(field => {
+          const value = parsedData[field.id];
+          return {
+            label: field.label,
+            value: Array.isArray(value) ? value.join(', ') : value || 'Não respondido'
+          };
+        });
+        return {
+          title: section.title,
+          fields: sectionFields
+        };
+      });
+    } catch (error) {
+      console.error('Erro ao parsear respostas:', error);
+      return [];
+    }
+  };
+
+  const handleDeleteEvent = async () => {
+    try {
+      const response = await fetch(`/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+
+      if (!response.ok) {
+        throw new Error('Erro ao excluir evento');
+      }
+
+      toast.success('Evento excluído com sucesso!');
+      router.push('/dashboard');
+    } catch (error) {
+      console.error('Erro ao excluir evento:', error);
+      toast.error('Erro ao excluir evento. Tente novamente.');
+    }
+  };
+
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <div className="flex items-center justify-between gap-4 mb-8">
+        <div className="flex items-center gap-4">
+          <Link href="/dashboard">
+            <Button variant="outline" size="icon">
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+          </Link>
+          <div>
+            <h1 className="text-3xl font-bold mb-1">{event.title}</h1>
+            <p className="text-muted-foreground">{event.description}</p>
+          </div>
+        </div>
+        
+        <Button 
+          variant="destructive" 
+          size="sm"
+          onClick={() => setShowDeleteDialog(true)}
+        >
+          <Trash2 className="h-4 w-4 mr-2" />
+          Excluir Formulário
+        </Button>
+      </div>
+
+      <div className="flex justify-between items-center mb-6">
+        <div className="flex items-center gap-4">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input 
+              placeholder="Buscar por nome..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 w-[300px]"
+            />
+          </div>
+          <p className="text-muted-foreground">
+            {filteredResponses.length} respostas encontradas
+          </p>
+        </div>
+
+        <div className='inline-flex gap-3'>
+        <Button onClick={handleExportCSV}>
+          <Download className="h-4 w-4 mr-2" />
+          Exportar CSV
+        </Button>
+
+        <Link href={`/events/${eventId}/check-in`}>
+          <Button variant="outline">
+            Check-in
+          </Button>
+        </Link>
+        </div>
+      </div>
+
+      {filteredResponses.length === 0 ? (
+        <div className="text-center py-12 border rounded-lg bg-muted/10">
+          <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <h3 className="text-lg font-medium mb-2">Nenhuma resposta encontrada</h3>
+          <p className="text-muted-foreground">
+            {searchTerm 
+              ? "Tente ajustar sua busca para encontrar mais respostas"
+              : "Aguardando respostas do formulário"}
+          </p>
+        </div>
+      ) : (
+        <div className="border rounded-lg">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Nome</TableHead>
+                <TableHead>Data</TableHead>
+                <TableHead>Ações</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filteredResponses.map((response) => (
+                <TableRow key={response.id}>
+                  <TableCell className="font-medium">
+                    {response.respondentName}
+                  </TableCell>
+                  <TableCell>
+                    {format(new Date(response.createdAt), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                  </TableCell>
+                  <TableCell>
+                    <Button 
+                      variant="outline" 
+                      size="sm"
+                      onClick={() => handleViewDetails(response)}
+                    >
+                      Ver detalhes
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      )}
+
+      <Dialog open={!!selectedResponse} onOpenChange={() => handleCloseDialog()}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-semibold">
+              Respostas de {selectedResponse?.respondentName}
+            </DialogTitle>
+            <p className="text-sm text-muted-foreground">
+              Enviado em {selectedResponse && format(new Date(selectedResponse.createdAt), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+            </p>
+          </DialogHeader>
+
+          <div className="space-y-6 py-4">
+            {selectedResponse && formatResponseData(selectedResponse.responses).map((section, index) => (
+              <div key={index} className="space-y-4">
+                <h3 className="text-lg font-medium">{section.title}</h3>
+                <div className="space-y-2">
+                  {section.fields.map((field, fieldIndex) => (
+                    <div key={fieldIndex} className="grid grid-cols-2 gap-2 py-2 border-b last:border-0">
+                      <span className="text-muted-foreground">{field.label}</span>
+                      <span>{field.value}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </DialogContent>
+      </Dialog>
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Excluir Formulário</DialogTitle>
+            <DialogDescription>
+              Tem certeza que deseja excluir este formulário? Esta ação não pode ser desfeita e todas as respostas serão perdidas.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setShowDeleteDialog(false)}
+            >
+              Cancelar
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteEvent}
+            >
+              Sim, excluir formulário
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+}
