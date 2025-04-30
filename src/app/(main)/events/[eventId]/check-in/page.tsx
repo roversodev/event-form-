@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, CheckCircle, XCircle } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -53,6 +53,7 @@ export default function CheckInPage() {
   const { eventId } = useParams();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedResponse, setSelectedResponse] = React.useState<Response | null>(null);
+  const [isCheckingIn, setIsCheckingIn] = React.useState(false);
 
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event-check-in', eventId],
@@ -64,6 +65,7 @@ export default function CheckInPage() {
   });
 
   const handleCheckIn = async (responseId: string) => {
+    setIsCheckingIn(true);
     try {
       const response = await fetch(`/api/events/${eventId}/check-in/${responseId}`, {
         method: 'POST',
@@ -78,6 +80,8 @@ export default function CheckInPage() {
       toast.success('Check-in realizado com sucesso!');
     } catch (error) {
       toast.error('Erro ao realizar check-in. Tente novamente.');
+    } finally {
+      setIsCheckingIn(false);
     }
   };
 
@@ -122,7 +126,7 @@ export default function CheckInPage() {
 
   if (isLoading) {
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="container mx-auto px-4 py-8 min-h-[80vh]">
           <Skeleton className="h-8 w-64 mb-4" />
           <Skeleton className="h-4 w-96 mb-8" />
           <div className="space-y-4">
@@ -135,7 +139,7 @@ export default function CheckInPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
+    <div className="container mx-auto px-4 py-8 min-h-[80vh]">
       <div className="mb-8">
         <h1 className="text-3xl font-bold mb-2">{event?.title}</h1>
         <p className="text-muted-foreground">Gerenciamento de Check-in</p>
@@ -234,13 +238,22 @@ export default function CheckInPage() {
             <Button
               variant="outline"
               onClick={() => setSelectedResponse(null)}
+              disabled={isCheckingIn}
             >
               Cancelar
             </Button>
             <Button
               onClick={() => selectedResponse && handleCheckIn(selectedResponse.id)}
+              disabled={isCheckingIn}
             >
-              Confirmar Check-in
+              {isCheckingIn ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Confirmando...
+                </>
+              ) : (
+                'Confirmar Check-in'
+              )}
             </Button>
           </DialogFooter>
         </DialogContent>
