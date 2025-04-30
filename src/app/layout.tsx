@@ -8,6 +8,7 @@ import { Toaster } from "@/components/ui/sonner";
 import SupabaseProvider from "@/providers/SupabaseProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { ThemeProvider } from "next-themes";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -47,6 +48,7 @@ export default async function RootLayout({
             <Navbar />
             {children}
             <Toaster />
+            <Footer />
             </ThemeProvider>
           </QueryProvider>
         </SupabaseProvider>

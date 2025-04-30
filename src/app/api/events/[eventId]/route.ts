@@ -81,10 +81,10 @@ export async function DELETE(
       );
     }
 
-    // Verificar se o usuário é dono do evento
+    // Verificar se o usuário é dono do evento e obter a URL da imagem
     const { data: event } = await supabase
       .from('events')
-      .select('user_id')
+      .select('user_id, background_image_url')
       .eq('id', eventId)
       .single();
 
@@ -93,6 +93,22 @@ export async function DELETE(
         { error: 'Não autorizado' },
         { status: 401 }
       );
+    }
+
+    // Se houver uma imagem de fundo, deletá-la do bucket
+    if (event.background_image_url) {
+      // Extrair o nome do arquivo da URL
+      const fileName = event.background_image_url.split('/').pop();
+      if (fileName) {
+        const { error: storageError } = await supabase.storage
+          .from('flyer-bucket')
+          .remove([`public/${fileName}`]);
+
+        if (storageError) {
+          console.error('Erro ao deletar imagem:', storageError);
+          // Continuar mesmo se houver erro ao deletar a imagem
+        }
+      }
     }
 
     // Deletar o evento (as políticas RLS e as foreign keys CASCADE cuidarão do resto)

@@ -1,13 +1,15 @@
 'use client';
 import { motion } from 'framer-motion';
-import { ArrowRight, Plus, Calendar, Users, CheckSquare } from 'lucide-react';
+import { ArrowRight, Plus, Calendar, Users, CheckSquare, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { useState } from 'react';
+import { toast } from 'sonner';
 
 const Index = () => {
   const [isHovered, setIsHovered] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
   
   const features = [
     { 
@@ -124,15 +126,68 @@ const Index = () => {
                 </motion.div>
               ))}
             </div>
+            
+            {/* Seção do Vídeo */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="mt-16 relative rounded-2xl overflow-hidden shadow-2xl border bg-card"
+            >
+              <div className="aspect-video relative">
+                <div 
+                  className={`absolute inset-0 bg-black/50 flex items-center justify-center transition-opacity duration-300 ${isPlaying ? 'opacity-0 pointer-events-none' : 'opacity-100'}`}
+                  onClick={() => {
+                    setIsPlaying(true);
+                    const video = document.querySelector('video');
+                    if (video) {
+                      video.play().catch(error => {
+                        console.error('Erro ao reproduzir vídeo:', error);
+                        toast.error('Erro ao reproduzir vídeo');
+                        setIsPlaying(false);
+                      });
+                    }
+                  }}
+                >
+                  <Button 
+                    size="lg" 
+                    variant="ghost" 
+                    className="rounded-full w-16 h-16 bg-white/10 hover:bg-white/20 hover:scale-110 transition-transform"
+                  >
+                    <Play className="h-8 w-8 text-white" />
+                  </Button>
+                </div>
+                
+                <video
+                  className="w-full h-full object-cover"
+                  src="/video/demo.mp4"
+                  poster="/video/thumbnail.jpg"
+                  controls={isPlaying}
+                  playsInline
+                  preload="metadata"
+                  controlsList="nodownload"
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  onEnded={() => setIsPlaying(false)}
+                  onClick={(e) => {
+                    if (!isPlaying) {
+                      e.preventDefault();
+                      setIsPlaying(true);
+                      const video = e.currentTarget;
+                      video.play().catch(() => setIsPlaying(false));
+                    }
+                  }}
+                >
+                  <source src="/video/demo.mp4" type="video/mp4" />
+                  <source src="/video/demo.webm" type="video/webm" />
+                  Seu navegador não suporta o elemento de vídeo.
+                </video>
+              </div>
+            </motion.div>
           </div>
         </section>
       </main>
       
-      <footer className="py-8 px-4 border-t">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 EventForm+ — Todos os direitos reservados</p>
-        </div>
-      </footer>
     </div>
   );
 };
