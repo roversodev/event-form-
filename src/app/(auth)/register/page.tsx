@@ -62,6 +62,7 @@ export default function RegisterPage() {
         options: {
           data: {
             name: data.name,
+            display_name: data.name,
           },
         },
       })
