@@ -2,7 +2,6 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, Plus, Calendar, Users, CheckSquare, Play } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import Navbar from '@/components/Navbar';
 import Link from 'next/link';
 import { useState } from 'react';
 import { toast } from 'sonner';
