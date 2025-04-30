@@ -3,13 +3,13 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Plus, Search, Calendar, User, Copy, Check, CopyCheck } from 'lucide-react';
+import { Plus, Search, Calendar, User, Copy, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
-import { getSession } from 'next-auth/react';
+import { useSupabase } from '@/providers/SupabaseProvider';
 import { toast } from 'sonner';
 
 interface Event {
@@ -23,13 +23,15 @@ interface Event {
 
 const Dashboard = () => {
   const router = useRouter();
+  const supabase = useSupabase();
   const [searchTerm, setSearchTerm] = React.useState('');
   const [copiedEventId, setCopiedEventId] = React.useState<string | null>(null);
 
   const { data: events = [], isLoading: eventsLoading } = useQuery<Event[]>({
     queryKey: ['events'],
     queryFn: async () => {
-      const session = await getSession();
+      const { data: { session } } = await supabase.auth.getSession();
+      
       if (!session) {
         router.push('/login');
         return [];

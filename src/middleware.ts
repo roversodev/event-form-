@@ -1,24 +1,16 @@
-import { withAuth } from "next-auth/middleware"
-import { NextRequest } from "next/server"
+import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { NextResponse } from 'next/server';
+import type { NextRequest } from 'next/server';
 
-export default withAuth(
-  function middleware(req: NextRequest) {},
-  {
-    pages: {
-      signIn: "/login",
-    },
-  }
-)
-
-// Protege tudo, exceto:
-// - / (home)
-// - /api (rotas de API)
-// - /uploads (arquivos públicos)
-// - /events/:eventId/form (formulário público)
-// - /register (página de registro)
-// - arquivos estáticos (_next/static, _next/image, favicon.ico)
-export const config = {
-  matcher: [
-    "/((?!api|uploads|_next/static|_next/image|favicon.ico|events/[^/]+/form|register|$).*)"
-  ],
+export async function middleware(req: NextRequest) {
+  const res = NextResponse.next();
+  const supabase = createMiddlewareClient({ req, res });
+  const { data: { session } } = await supabase.auth.getSession();
+  return res;
 }
+
+export const config = {
+  matcher: ['/dashboard/:path*', '/events/:path*', '/login', '/register'],
+};
+
+export const dynamic = 'force-dynamic'

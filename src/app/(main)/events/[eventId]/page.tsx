@@ -40,9 +40,9 @@ import { toast } from 'sonner';
 
 interface FormResponse {
   id: string;
-  respondentName: string;
+  respondent_name: string; // Changed from respondentName to match Supabase
   responses: string;
-  createdAt: string;
+  created_at: string; // Changed from createdAt to match Supabase
 }
 
 interface Event {
@@ -99,8 +99,8 @@ export default function EventManagement() {
     );
   }
 
-  const filteredResponses = event.responses.filter(response => 
-    response.respondentName.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredResponses = (event.responses || []).filter(response => 
+    response.respondent_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleExportCSV = () => {
@@ -120,8 +120,8 @@ export default function EventManagement() {
         
         // Adiciona nome e data
         row.push(
-          response.respondentName,
-          format(new Date(response.createdAt), "dd/MM/yyyy HH:mm:ss")
+          response.respondent_name,
+          format(new Date(response.created_at), "dd/MM/yyyy HH:mm:ss")
         );
   
         // Parse as respostas
@@ -297,10 +297,10 @@ export default function EventManagement() {
               {filteredResponses.map((response) => (
                 <TableRow key={response.id}>
                   <TableCell className="font-medium">
-                    {response.respondentName}
+                    {response.respondent_name}
                   </TableCell>
                   <TableCell>
-                    {format(new Date(response.createdAt), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+                    {format(new Date(response.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
                   </TableCell>
                   <TableCell>
                     <Button 
@@ -322,10 +322,10 @@ export default function EventManagement() {
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold">
-              Respostas de {selectedResponse?.respondentName}
+              Respostas de {selectedResponse?.respondent_name}
             </DialogTitle>
             <p className="text-sm text-muted-foreground">
-              Enviado em {selectedResponse && format(new Date(selectedResponse.createdAt), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
+              Enviado em {selectedResponse && format(new Date(selectedResponse.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
             </p>
           </DialogHeader>
 

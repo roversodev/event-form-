@@ -1,34 +1,36 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
 export async function GET(
   request: Request,
-  context: any // Usando any para contornar problemas de tipagem no Next.js 15
+  context: any
 ) {
   try {
-    const { eventId } = context.params;
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
+    const { eventId } = await context.params;
     const includeResponses = new URL(request.url).searchParams.get('includeResponses') === 'true';
 
-    const event = await prisma.event.findUnique({
-      where: { id: eventId },
-      include: {
-        sections: {
-          orderBy: {
-            orderIndex: 'asc'
-          },
-          include: {
-            fields: {
-              orderBy: {
-                orderIndex: 'asc'
-              }
-            }
-          }
-        },
-        responses: includeResponses
-      }
-    });
+    // Buscar o evento com suas seções e campos
+    const { data: event, error } = await supabase
+      .from('events')
+      .select(`
+        *,
+        sections:form_sections(
+          *,
+          fields:form_fields(*)
+        ),
+        responses:form_responses(*)
+      `)
+      .eq('id', eventId)
+      .order('order_index', { foreignTable: 'form_sections' })
+      .order('order_index', { foreignTable: 'form_sections.form_fields' })
+      .single();
+
+    if (error) throw error;
 
     if (!event) {
       return NextResponse.json(
@@ -37,15 +39,17 @@ export async function GET(
       );
     }
 
+    // Formatar o evento para manter a mesma estrutura anterior
     const formattedEvent = {
       ...event,
-      sections: event.sections.map(section => ({
+      sections: event.sections.map((section: { fields: any[]; }) => ({
         ...section,
-        fields: section.fields.map(field => ({
+        fields: section.fields.map((field: { options: string; }) => ({
           ...field,
           options: field.options ? JSON.parse(field.options) : null
         }))
-      }))
+      })),
+      responses: includeResponses ? event.responses : undefined
     };
 
     return NextResponse.json(formattedEvent);
@@ -60,11 +64,15 @@ export async function GET(
 
 export async function DELETE(
   request: Request,
-  context: any // Também usando any aqui para acessar params
+  context: any
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const { eventId } = context.params;
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
+    const { data: { session } } = await supabase.auth.getSession();
+    const { eventId } = await context.params;
 
     if (!session?.user) {
       return NextResponse.json(
@@ -73,17 +81,27 @@ export async function DELETE(
       );
     }
 
-    await prisma.$transaction([
-      prisma.emailReminder.deleteMany({ where: { eventId } }),
-      prisma.formResponse.deleteMany({ where: { eventId } }),
-      prisma.formField.deleteMany({
-        where: {
-          section: { eventId }
-        }
-      }),
-      prisma.formSection.deleteMany({ where: { eventId } }),
-      prisma.event.delete({ where: { id: eventId } })
-    ]);
+    // Verificar se o usuário é dono do evento
+    const { data: event } = await supabase
+      .from('events')
+      .select('user_id')
+      .eq('id', eventId)
+      .single();
+
+    if (!event || event.user_id !== session.user.id) {
+      return NextResponse.json(
+        { error: 'Não autorizado' },
+        { status: 401 }
+      );
+    }
+
+    // Deletar o evento (as políticas RLS e as foreign keys CASCADE cuidarão do resto)
+    const { error } = await supabase
+      .from('events')
+      .delete()
+      .eq('id', eventId);
+
+    if (error) throw error;
 
     return NextResponse.json({ success: true });
   } catch (error) {

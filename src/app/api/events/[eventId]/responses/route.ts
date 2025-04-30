@@ -1,55 +1,68 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma } from '@/lib/prisma';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
 
 export async function POST(
   request: NextRequest,
-  context: any // Usando any para contornar problemas de tipagem
+  context: any
 ) {
   try {
-    const eventId = context.params.eventId;
+    const params = await context.params;
+    const eventId = params.eventId;
     const { formData } = await request.json();
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
 
     // Verifica se o evento existe
-    const event = await prisma.event.findUnique({
-      where: { id: eventId },
-      include: {
-        sections: {
-          include: {
-            fields: true
-          }
-        }
-      }
-    });
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .select(`
+        *,
+        sections:form_sections(
+          *,
+          fields:form_fields(*)
+        )
+      `)
+      .eq('id', eventId)
+      .single();
 
-    if (!event) {
+    if (eventError || !event) {
       return NextResponse.json(
         { error: 'Evento não encontrado' },
         { status: 404 }
       );
     }
 
-    // Find the name field in the form data
+    // Encontra o campo de nome nos dados do formulário
     const nameField = Object.entries(formData).find(([fieldId, value]) => {
       const field = event.sections
-        .flatMap(s => s.fields)
-        .find(f => f.id === fieldId && f.label.toLowerCase().includes('nome'));
+        .flatMap((s: { fields: any; }) => s.fields)
+        .find((f: { id: string; label: string; }) => f.id === fieldId && f.label.toLowerCase().includes('nome'));
       return field !== undefined;
     });
 
-    // Get the respondent name from the form data or use a default
+    // Obtém o nome do respondente dos dados do formulário ou usa um padrão
     const respondentName = nameField ? String(nameField[1]) : 'Anonymous';
 
-    // Convert form data to responses string
+    // Converte os dados do formulário para string
     const responses = JSON.stringify(formData);
 
-    // Cria a resposta do formulário
-    const response = await prisma.formResponse.create({
-      data: {
-        eventId,
-        respondentName,
-        responses // This contains the stringified form data
-      }
-    });
+    // Cria a resposta do formulário no Supabase
+    const { data: response, error: responseError } = await supabase
+      .from('form_responses')
+      .insert({
+        event_id: eventId,
+        respondent_name: respondentName,
+        responses
+      })
+      .select()
+      .single();
+
+    if (responseError) throw responseError;
 
     return NextResponse.json(response);
   } catch (error) {

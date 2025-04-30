@@ -1,34 +1,46 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
 
-// Abordagem simplificada para Next.js 15
+export const dynamic = 'force-dynamic';
+
 export async function POST(
   request: NextRequest,
-  context: any // Use 'any' temporariamente para contornar problemas de tipagem
+  context: any
 ) {
   try {
-    const session = await getServerSession(authOptions);
-    const { eventId, responseId } = context.params;
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
     
-    if (!session?.user) {
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
+    
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+    const { eventId, responseId } = await context.params;
+
+    if (sessionError || !session?.user) {
       return NextResponse.json(
         { error: 'Não autorizado' },
         { status: 401 }
       );
     }
 
-    const response = await prisma.formResponse.update({
-      where: {
-        id: responseId,
-        eventId: eventId,
-      },
-      data: {
-        checkedIn: true,
-        checkedInAt: new Date(),
-      }
-    });
+    // Atualiza o status de check-in da resposta
+    const { data: response, error: updateError } = await supabase
+      .from('form_responses')
+      .update({
+        checked_in: true,
+        checked_in_at: new Date().toISOString()
+      })
+      .eq('id', responseId)
+      .eq('event_id', eventId)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('Erro ao atualizar check-in:', updateError);
+      throw updateError;
+    }
 
     return NextResponse.json(response);
   } catch (error) {

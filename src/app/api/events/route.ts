@@ -1,11 +1,25 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
-import { authOptions } from '@/lib/auth';
-import { prisma } from '@/lib/prisma';
+import { createRouteHandlerClient } from '@supabase/auth-helpers-nextjs';
+import { cookies } from 'next/headers';
+
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
   try {
-    const session = await getServerSession(authOptions);
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
+    
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error('Erro na sessão:', sessionError);
+      return NextResponse.json(
+        { error: 'Erro de autenticação' },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user) {
       return NextResponse.json(
@@ -14,25 +28,27 @@ export async function GET() {
       );
     }
 
-    const events = await prisma.event.findMany({
-      where: {
-        userId: session.user.id
-      },
-      include: {
-        _count: {
-          select: { responses: true }
-        }
-      },
-      orderBy: {
-        createdAt: 'desc'
-      }
-    });
+    const { data: events, error } = await supabase
+      .from('events')
+      .select(`
+        *,
+        responses:form_responses(count)
+      `)
+      .eq('user_id', session.user.id)
+      .order('created_at', { ascending: false });
 
-    // Formata os eventos para incluir a contagem de respostas
+    if (error) throw error;
+
     const formattedEvents = events.map(event => ({
       ...event,
-      responses: event._count.responses,
-      _count: undefined
+      responses: event.responses[0].count,
+      userId: event.user_id,
+      createdAt: event.created_at,
+      updatedAt: event.updated_at,
+      eventDate: event.event_date,
+      backgroundImageUrl: event.background_image_url,
+      primaryColor: event.primary_color,
+      accentColor: event.accent_color
     }));
 
     return NextResponse.json(formattedEvents);
@@ -47,7 +63,20 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
+    const cookieStore = await new Promise((resolve) => {
+      resolve(cookies());
+    });
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore as any });
+    
+    const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+    if (sessionError) {
+      console.error('Erro na sessão:', sessionError);
+      return NextResponse.json(
+        { error: 'Erro de autenticação' },
+        { status: 401 }
+      );
+    }
 
     if (!session?.user) {
       return NextResponse.json(
@@ -58,34 +87,55 @@ export async function POST(request: Request) {
 
     const body = await request.json();
 
-    const event = await prisma.event.create({
-      data: {
+    // Primeiro, cria o evento
+    const { data: event, error: eventError } = await supabase
+      .from('events')
+      .insert({
         title: body.title,
         description: body.description,
-        primaryColor: body.primaryColor,
-        accentColor: body.accentColor,
-        backgroundImageUrl: body.backgroundImageUrl,
-        eventDate: body.eventDate,
-        userId: session.user.id,
-        sections: {
-          create: body.sections.map((section: any, sectionIndex: number) => ({
-            title: section.title,
-            description: section.description,
-            orderIndex: sectionIndex,
-            fields: {
-              create: section.fields.map((field: any, fieldIndex: number) => ({
-                type: field.type,
-                label: field.label,
-                placeholder: field.placeholder || null,
-                required: field.required,
-                options: field.options ? JSON.stringify(field.options) : null,
-                orderIndex: fieldIndex,
-              }))
-            }
-          }))
-        }
-      }
-    });
+        primary_color: body.primaryColor,
+        accent_color: body.accentColor,
+        background_image_url: body.backgroundImageUrl,
+        event_date: body.eventDate,
+        user_id: session.user.id
+      })
+      .select()
+      .single();
+
+    if (eventError) throw eventError;
+
+    // Depois, cria as seções e campos
+    for (const [sectionIndex, section] of body.sections.entries()) {
+      const { data: sectionData, error: sectionError } = await supabase
+        .from('form_sections')
+        .insert({
+          event_id: event.id,
+          title: section.title,
+          description: section.description,
+          order_index: sectionIndex
+        })
+        .select()
+        .single();
+
+      if (sectionError) throw sectionError;
+
+      // Cria os campos para cada seção
+      const fieldsToInsert = section.fields.map((field: any, fieldIndex: number) => ({
+        section_id: sectionData.id,
+        type: field.type,
+        label: field.label,
+        placeholder: field.placeholder || null,
+        required: field.required,
+        options: field.options ? JSON.stringify(field.options) : null,
+        order_index: fieldIndex
+      }));
+
+      const { error: fieldsError } = await supabase
+        .from('form_fields')
+        .insert(fieldsToInsert);
+
+      if (fieldsError) throw fieldsError;
+    }
 
     return NextResponse.json(event);
   } catch (error) {

@@ -1,62 +1,69 @@
-import { NextAuthOptions } from "next-auth"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { prisma } from "@/lib/prisma"
-import CredentialsProvider from "next-auth/providers/credentials"
-import bcrypt from "bcryptjs"
+import { createClient } from '@supabase/supabase-js';
+import { Database } from '@/types/database.types';
 
-export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(prisma),
-  providers: [
-    CredentialsProvider({
-      name: "credentials",
-      credentials: {
-        email: { label: "Email", type: "email" },
-        password: { label: "Senha", type: "password" }
-      },
-      async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) {
-          throw new Error("Credenciais inválidas")
-        }
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
-        const user = await prisma.user.findUnique({
-          where: {
-            email: credentials.email
-          }
-        })
+export const supabase = createClient<Database>(supabaseUrl, supabaseAnonKey);
 
-        if (!user || !user.password) {
-          throw new Error("Usuário não encontrado")
-        }
+export type AuthError = {
+  message: string;
+};
 
-        const isPasswordValid = await bcrypt.compare(
-          credentials.password,
-          user.password
-        )
+export async function signIn(email: string, password: string) {
+  const { data, error } = await supabase.auth.signInWithPassword({
+    email,
+    password,
+  });
 
-        if (!isPasswordValid) {
-          throw new Error("Senha incorreta")
-        }
-
-        return {
-          id: user.id,
-          email: user.email,
-          name: user.name
-        }
-      }
-    })
-  ],
-  session: {
-    strategy: "jwt"
-  },
-  pages: {
-    signIn: "/login"
-  },
-  callbacks: {
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub
-      }
-      return session
-    }
+  if (error) {
+    throw new Error(error.message);
   }
+
+  return data;
+}
+
+export async function signUp(email: string, password: string, name: string) {
+  const { data, error } = await supabase.auth.signUp({
+    email,
+    password,
+    options: {
+      data: {
+        name,
+      },
+    },
+  });
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return data;
+}
+
+export async function signOut() {
+  const { error } = await supabase.auth.signOut();
+  if (error) {
+    throw new Error(error.message);
+  }
+}
+
+export async function getSession() {
+  const { data: { session }, error } = await supabase.auth.getSession();
+  
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return session;
+}
+
+export async function getCurrentUser() {
+  const { data: { user }, error } = await supabase.auth.getUser();
+  
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return user;
 }

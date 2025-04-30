@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Save, Trash2, ImagePlus, Plus, Minus } from 'lucide-react';
 import { useRouter } from 'next/navigation';
@@ -9,7 +9,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
-import { useSession } from 'next-auth/react';
+import { useSupabase } from '@/providers/SupabaseProvider';
+import type { User } from '@supabase/supabase-js';
+import { v4 as uuidv4 } from 'uuid';
+
 
 type FieldType = 'text' | 'email' | 'number' | 'phone' | 'date' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'file';
 
@@ -19,7 +22,7 @@ interface FormField {
   label: string;
   placeholder?: string;
   required: boolean;
-  options?: string[]; // Adicionado suporte para opções
+  options?: string[];
 }
 
 interface FormSection {
@@ -29,9 +32,32 @@ interface FormSection {
   fields: FormField[];
 }
 
+
 const NewEvent = () => {
-  const { data: session } = useSession();
   const router = useRouter();
+  const supabase = useSupabase();
+  const [user, setUser] = useState<User | null>(null);
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { session }, error } = await supabase.auth.getSession();
+      if (error) {
+        console.error('Erro ao buscar sessão:', error);
+        return;
+      }
+      setUser(session?.user ?? null);
+    };
+
+    getUser();
+
+    // Escutar mudanças na autenticação
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState(1);
   const [eventTitle, setEventTitle] = useState('');
@@ -246,7 +272,7 @@ const NewEvent = () => {
   };
 
   const saveEvent = async () => {
-    if (!session?.user) {
+    if (!user) {
       toast.error('Você precisa estar logado para criar um evento');
       router.push('/login');
       return;
@@ -260,15 +286,32 @@ const NewEvent = () => {
       
       
       if (backgroundFile) {
-        const formData = new FormData();
-        formData.append('file', backgroundFile);
-        const response = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
-        if (!response.ok) throw new Error('Erro ao fazer upload da imagem de fundo');
-        const data = await response.json();
-        backgroundUrl = data.url;
+        const fileExt = backgroundFile.name.split('.').pop();
+        const fileName = `${uuidv4()}.${fileExt}`;
+        
+        // Upload do arquivo
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('flyer-bucket')
+          .upload(`public/${fileName}`, backgroundFile, {
+            cacheControl: '3600',
+            upsert: false
+          });
+        
+        if (uploadError) {
+          console.error('Erro de upload:', uploadError);
+          throw new Error('Erro ao fazer upload da imagem de fundo');
+        }
+        
+        // Obter URL pública
+        const { data } = await supabase.storage
+          .from('flyer-bucket')
+          .getPublicUrl(`public/${fileName}`);
+        
+        if (!data.publicUrl) {
+          throw new Error('Erro ao obter URL pública da imagem');
+        }
+        
+        backgroundUrl = data.publicUrl;
       }
       
       // Criar evento
@@ -284,7 +327,7 @@ const NewEvent = () => {
           accentColor,
           backgroundImageUrl: backgroundUrl,
           eventDate: new Date().toISOString(),
-          userId: session.user.id, // Adicionando o userId explicitamente
+          userId: user.id, // Adicionando o userId explicitamente
           sections: sections.map((section, sectionIndex) => ({
             title: section.title,
             description: section.description,

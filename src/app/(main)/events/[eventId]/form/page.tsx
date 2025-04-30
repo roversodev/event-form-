@@ -30,10 +30,10 @@ interface Event {
   id: string;
   title: string;
   description: string;
-  primaryColor: string;
-  accentColor: string;
-  logoUrl?: string;
-  backgroundImageUrl?: string;
+  primary_color: string;
+  accent_color: string;
+  logo_url?: string;
+  background_image_url?: string;
   sections: FormSection[];
 }
 
@@ -200,13 +200,13 @@ export default function EventForm() {
           <div 
             className="bg-card rounded-xl shadow-lg overflow-hidden"
             style={{
-              backgroundColor: event.primaryColor,
+              backgroundColor: event.primary_color,
             }}
           >
-            {event.backgroundImageUrl && (
-              <div className="w-full h-[300px]">
+            {event.background_image_url && (
+              <div className="w-full h-full">
                 <img
-                  src={event.backgroundImageUrl}
+                  src={`${event.background_image_url}`}
                   alt={`Banner do evento ${event.title}`}
                   className="w-full h-full object-cover"
                 />
@@ -214,17 +214,17 @@ export default function EventForm() {
             )}
 
             <div className="p-6">
-              {event.logoUrl && (
+              {event.logo_url && (
                 <div className="w-24 h-24 mb-4">
                   <img
-                    src={event.logoUrl}
+                    src={`${event.logo_url}`}
                     alt={`Logo do evento ${event.title}`}
                     className="w-full h-full object-contain"
                   />
                 </div>
               )}
 
-              <h1 className="text-3xl font-bold mb-2" style={{ color: event.accentColor }}>
+              <h1 className="text-3xl font-bold mb-2" style={{ color: event.accent_color }}>
                 {event.title}
               </h1>
               <p className="text-muted-foreground">{event.description}</p>
@@ -269,7 +269,7 @@ export default function EventForm() {
                   type="submit"
                   className="w-full text-white"
                   disabled={isSubmitting}
-                  style={{ backgroundColor: event.accentColor }}
+                  style={{ backgroundColor: event.accent_color }}
                 >
                   {isSubmitting ? (
                     <Loader2 className="h-4 w-4 animate-spin" />

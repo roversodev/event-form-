@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useSupabase } from "@/providers/SupabaseProvider"
 
 const registerSchema = z.object({
   name: z.string()
@@ -39,6 +40,8 @@ type RegisterFormData = z.infer<typeof registerSchema>
 
 export default function RegisterPage() {
   const router = useRouter()
+  const supabase = useSupabase()
+  const [loading, setLoading] = useState(false)
   
   const form = useForm<RegisterFormData>({
     resolver: zodResolver(registerSchema),
@@ -52,27 +55,28 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterFormData) {
     try {
-      const response = await fetch('/api/auth/register', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+      setLoading(true)
+      const { error } = await supabase.auth.signUp({
+        email: data.email,
+        password: data.password,
+        options: {
+          data: {
+            name: data.name,
+          },
         },
-        body: JSON.stringify({
-          name: data.name,
-          email: data.email,
-          password: data.password,
-        }),
       })
 
-      if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.message)
+      if (error) {
+        toast.error(error.message)
+        return
       }
 
-      toast.success('Conta criada com sucesso!')
+      toast.success('Conta criada com sucesso! Verifique seu email.')
       router.push('/login')
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Erro ao criar conta')
+      toast.error('Erro ao criar conta')
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -146,8 +150,12 @@ export default function RegisterPage() {
               )}
             />
 
-            <Button type="submit" className="w-full">
-              Cadastrar
+            <Button 
+              type="submit" 
+              className="w-full"
+              disabled={loading}
+            >
+              {loading ? 'Criando conta...' : 'Cadastrar'}
             </Button>
           </form>
         </Form>

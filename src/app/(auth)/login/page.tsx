@@ -1,7 +1,6 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -18,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
+import { useSupabase } from "@/providers/SupabaseProvider"
 
 const loginSchema = z.object({
   email: z.string()
@@ -32,6 +32,8 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export default function LoginPage() {
   const router = useRouter()
+  const supabase = useSupabase()
+  const [loading, setLoading] = useState(false)
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
@@ -43,19 +45,39 @@ export default function LoginPage() {
 
   async function onSubmit(data: LoginFormData) {
     try {
-      const result = await signIn("credentials", {
-        ...data,
-        redirect: false
+      setLoading(true)
+      const { data: authData, error } = await supabase.auth.signInWithPassword({
+        email: data.email,
+        password: data.password,
       })
-
-      if (result?.error) {
-        toast.error('Email ou senha incorretos')
-      } else {
-        router.push("/dashboard")
-        router.refresh()
+  
+      if (error) {
+        if (error.message.includes('Email not confirmed')) {
+          toast.error('Por favor, confirme seu email antes de fazer login')
+        } else if (error.message.includes('Invalid login credentials')) {
+          toast.error('Email ou senha incorretos')
+        } else {
+          toast.error(error.message)
+        }
+        return
       }
+  
+      if (!authData.user) {
+        toast.error('Erro ao fazer login. Tente novamente.')
+        return
+      }
+  
+      // Aguarda a atualização da sessão antes de redirecionar
+      await supabase.auth.getSession()
+      
+      toast.success('Login realizado com sucesso')
+      router.push("/dashboard")
+      router.refresh()
     } catch (error) {
       toast.error('Erro ao fazer login')
+      console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -101,8 +123,12 @@ export default function LoginPage() {
               )}
             />
 
-            <Button type="submit" className="w-full cursor-pointer">
-              Entrar
+            <Button 
+              type="submit" 
+              className="w-full cursor-pointer"
+              disabled={loading}
+            >
+              {loading ? 'Entrando...' : 'Entrar'}
             </Button>
           </form>
         </Form>

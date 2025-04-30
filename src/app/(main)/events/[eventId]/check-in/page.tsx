@@ -26,10 +26,10 @@ import {
 
 interface Response {
   id: string;
-  respondentName: string;
+  respondent_name: string; // Atualizado para snake_case
   responses: string;
-  checkedIn: boolean;
-  checkedInAt?: string;
+  checked_in: boolean; // Atualizado para snake_case
+  checked_in_at?: string; // Atualizado para snake_case
 }
 
 interface Event {
@@ -43,7 +43,7 @@ interface Event {
       id: string;
       label: string;
       type: string;
-      options?: string; // Adicionado para campos com opções
+      options?: string;
     }>;
   }>;
   responses: Response[];
@@ -117,7 +117,7 @@ export default function CheckInPage() {
   };
 
   const filteredResponses = event?.responses.filter(response =>
-    response.respondentName.toLowerCase().includes(searchTerm.toLowerCase())
+    response.respondent_name.toLowerCase().includes(searchTerm.toLowerCase())
   ) || [];
 
   if (isLoading) {
@@ -169,11 +169,11 @@ export default function CheckInPage() {
             {filteredResponses.map((response) => (
               <TableRow key={response.id}>
                 <TableCell className="font-medium">
-                  {response.respondentName}
+                  {response.respondent_name}
                 </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {response.checkedIn ? (
+                    {response.checked_in ? (
                       <>
                         <CheckCircle className="h-4 w-4 text-green-500" />
                         <span className="text-green-500">Check-in realizado</span>
@@ -191,9 +191,9 @@ export default function CheckInPage() {
                     variant="outline"
                     size="sm"
                     onClick={() => setSelectedResponse(response)}
-                    disabled={response.checkedIn}
+                    disabled={response.checked_in}
                   >
-                    {response.checkedIn ? 'Já realizou check-in' : 'Realizar Check-in'}
+                    {response.checked_in ? 'Já realizou check-in' : 'Realizar Check-in'}
                   </Button>
                 </TableCell>
               </TableRow>
@@ -210,7 +210,7 @@ export default function CheckInPage() {
           
           <div className="py-4">
             <h3 className="text-lg font-semibold mb-4">
-              {selectedResponse?.respondentName}
+              {selectedResponse?.respondent_name}
             </h3>
             
             <div className="space-y-6">

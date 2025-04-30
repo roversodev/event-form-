@@ -10,15 +10,35 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
-import { useSession, signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
+import { useSupabase } from "@/providers/SupabaseProvider";
+import { useEffect, useState } from "react";
+import type { User as SupabaseUser } from '@supabase/supabase-js';
 
 const Navbar = () => {
-  const { data: session } = useSession();
   const router = useRouter();
+  const supabase = useSupabase();
+  const [user, setUser] = useState<SupabaseUser | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    getUser();
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, [supabase]);
 
   const handleSignOut = async () => {
-    await signOut({ redirect: false });
+    await supabase.auth.signOut();
     router.push('/login');
   };
 
@@ -34,7 +54,7 @@ const Navbar = () => {
         <div className="flex items-center gap-4">
           <ThemeToggleButton variant="circle" start="top-left" />
 
-          {session?.user && (
+          {user && (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" size="icon">
