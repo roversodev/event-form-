@@ -84,8 +84,11 @@ export default function EventForm() {
         throw new Error('Erro ao enviar formulário');
       }
 
+      const data = await response.json();
       toast.success('Formulário enviado com sucesso!');
-      setFormData({});
+      
+      // Redireciona para a página de agradecimento com as cores do evento
+      window.location.href = `/events/${eventId}/form/thank-you?primary=${encodeURIComponent(event.primary_color)}&accent=${encodeURIComponent(event.accent_color)}&title=${encodeURIComponent(event.title)}`;
     } catch (error) {
       toast.error('Erro ao enviar formulário. Tente novamente.');
     } finally {

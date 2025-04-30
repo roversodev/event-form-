@@ -4,9 +4,9 @@ import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { motion } from 'framer-motion';
-import { 
-  ArrowLeft, 
-  Download, 
+import {
+  ArrowLeft,
+  Download,
   CheckCircle,
   XCircle,
   Search,
@@ -36,9 +36,11 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { toast } from 'sonner';
+import { ResponseDataTable } from '@/components/ResponsesTable';
 
 
 interface FormResponse {
+  event_id: string; // Changed from eventId to match Supabase colum
   id: string;
   respondent_name: string; // Changed from respondentName to match Supabase
   responses: string;
@@ -68,7 +70,7 @@ export default function EventManagement() {
   const [selectedResponse, setSelectedResponse] = React.useState<FormResponse | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
-  const { data: event, isLoading } = useQuery<Event>({
+  const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event', eventId],
     queryFn: async () => {
       const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
@@ -79,7 +81,7 @@ export default function EventManagement() {
 
   if (isLoading) {
     return (
-      <div className="container mx-auto px-4 py-8">
+      <div className="container mx-auto px-4 py-8 min-h-[80vh]">
         <Skeleton className="h-8 w-64 mb-4" />
         <Skeleton className="h-4 w-96 mb-8" />
         <div className="space-y-4">
@@ -99,7 +101,7 @@ export default function EventManagement() {
     );
   }
 
-  const filteredResponses = (event.responses || []).filter(response => 
+  const filteredResponses = (event.responses || []).filter(response =>
     response.respondent_name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -113,56 +115,56 @@ export default function EventManagement() {
           headers.push(`${section.title} - ${field.label}`);
         });
       });
-  
+
       // Prepara as linhas de dados
       const rows = filteredResponses.map(response => {
         const row = [];
-        
+
         // Adiciona nome e data
         row.push(
           response.respondent_name,
           format(new Date(response.created_at), "dd/MM/yyyy HH:mm:ss")
         );
-  
+
         // Parse as respostas
         const parsedResponses = JSON.parse(response.responses);
-        
+
         // Adiciona cada resposta em sua própria coluna
         event.sections.forEach(section => {
           section.fields.forEach(field => {
             const value = parsedResponses[field.id];
-            const formattedValue = Array.isArray(value) 
-              ? value.join('; ') 
+            const formattedValue = Array.isArray(value)
+              ? value.join('; ')
               : value || '';
             row.push(formattedValue);
           });
         });
-  
+
         return row;
       });
-  
+
       // Converte para formato CSV com BOM para suporte adequado a caracteres especiais
       const BOM = '\uFEFF';
       const csvContent = BOM + [
         headers.join(','),
-        ...rows.map(row => 
-          row.map(cell => 
+        ...rows.map(row =>
+          row.map(cell =>
             `"${String(cell).replace(/"/g, '""')}"`
           ).join(',')
         )
       ].join('\n');
-  
+
       // Cria o blob e faz o download
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
-      
+
       link.setAttribute('href', url);
       link.setAttribute('download', `${event.title}_respostas.csv`);
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-  
+
       toast.success('Respostas exportadas com sucesso!');
     } catch (error) {
       console.error('Erro ao exportar CSV:', error);
@@ -219,9 +221,9 @@ export default function EventManagement() {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center justify-between gap-4 mb-8">
-        <div className="flex items-center gap-4">
+    <div className="container mx-auto px-4 py-8 min-h-[80vh]">
+      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
+        <div className="flex items-start md:items-center gap-4 w-full">
           <Link href="/dashboard">
             <Button variant="outline" size="icon">
               <ArrowLeft className="h-4 w-4" />
@@ -232,9 +234,9 @@ export default function EventManagement() {
             <p className="text-muted-foreground">{event.description}</p>
           </div>
         </div>
-        
-        <Button 
-          variant="destructive" 
+
+        <Button
+          variant="destructive"
           size="sm"
           onClick={() => setShowDeleteDialog(true)}
         >
@@ -243,15 +245,15 @@ export default function EventManagement() {
         </Button>
       </div>
 
-      <div className="flex justify-between items-center mb-6">
-        <div className="flex items-center gap-4">
-          <div className="relative">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 w-full">
+          <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input 
-              placeholder="Buscar por nome..." 
+            <Input
+              placeholder="Buscar por nome..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-[300px]"
+              className="pl-10 w-full"
             />
           </div>
           <p className="text-muted-foreground">
@@ -259,62 +261,38 @@ export default function EventManagement() {
           </p>
         </div>
 
-        <div className='inline-flex gap-3'>
-        <Button onClick={handleExportCSV}>
-          <Download className="h-4 w-4 mr-2" />
-          Exportar CSV
-        </Button>
-
-        <Link href={`/events/${eventId}/check-in`}>
-          <Button variant="outline">
-            Check-in
+        <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
+          <Button onClick={handleExportCSV} className="w-full sm:w-auto">
+            <Download className="h-4 w-4 mr-2" />
+            Exportar CSV
           </Button>
-        </Link>
+
+          <Link href={`/events/${eventId}/check-in`} className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto">
+              Check-in
+            </Button>
+          </Link>
         </div>
       </div>
+
 
       {filteredResponses.length === 0 ? (
         <div className="text-center py-12 border rounded-lg bg-muted/10">
           <User className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
           <h3 className="text-lg font-medium mb-2">Nenhuma resposta encontrada</h3>
           <p className="text-muted-foreground">
-            {searchTerm 
+            {searchTerm
               ? "Tente ajustar sua busca para encontrar mais respostas"
               : "Aguardando respostas do formulário"}
           </p>
         </div>
       ) : (
         <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Nome</TableHead>
-                <TableHead>Data</TableHead>
-                <TableHead>Ações</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {filteredResponses.map((response) => (
-                <TableRow key={response.id}>
-                  <TableCell className="font-medium">
-                    {response.respondent_name}
-                  </TableCell>
-                  <TableCell>
-                    {format(new Date(response.created_at), "dd 'de' MMMM 'às' HH:mm", { locale: ptBR })}
-                  </TableCell>
-                  <TableCell>
-                    <Button 
-                      variant="outline" 
-                      size="sm"
-                      onClick={() => handleViewDetails(response)}
-                    >
-                      Ver detalhes
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
+          <ResponseDataTable
+            responses={filteredResponses}
+            onViewDetails={handleViewDetails}
+            onDeleteSuccess={() => refetch()}
+          />
         </div>
       )}
 
