@@ -430,7 +430,7 @@ const NewEvent = () => {
                       <div className="text-center">
                         <ImagePlus className="mx-auto h-12 w-12 text-muted-foreground" />
                         <p className="mt-2 text-sm text-muted-foreground">
-                          Clique para fazer upload da imagem de fundo
+                          Clique para fazer upload da imagem antes do form (cuidado ela terá o tamanho original)
                         </p>
                         <Input 
                           id="background" 
@@ -926,11 +926,7 @@ const NewEvent = () => {
         </div>
       </main>
       
-      <footer className="py-6 px-4 border-t mt-auto">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 EventForm+ — Todos os direitos reservados</p>
-        </div>
-      </footer>
+
     </div>
   );
 };

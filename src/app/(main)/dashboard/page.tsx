@@ -170,11 +170,7 @@ const Dashboard = () => {
         )}
       </main>
 
-      <footer className="py-6 px-4 border-t mt-auto">
-        <div className="container mx-auto text-center text-muted-foreground">
-          <p>© 2025 EventForm+ — Todos os direitos reservados</p>
-        </div>
-      </footer>
+
     </div>
   );
 };
