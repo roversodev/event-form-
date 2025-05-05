@@ -404,7 +404,7 @@ const NewEvent = () => {
               <div className="grid grid-cols-1 md:grid-cols-1 gap-6 pt-4">
                 <div>
                   <label htmlFor="background" className="block text-sm font-medium mb-2">
-                    Imagem de Fundo
+                    Flyer do Evento
                   </label>
                   <div className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg p-4 hover:bg-muted/50 transition-colors">
                     {backgroundPreview ? (
@@ -449,6 +449,9 @@ const NewEvent = () => {
                       </div>
                     )}
                   </div>
+                  <p className="mt-2 text-sm text-muted-foreground">
+                          Imagens pesadas podem demorar para carregar, então não esqueça de otimizar as imagens antes de fazer o upload.
+                        </p>
                 </div>
               </div>
             </div>
