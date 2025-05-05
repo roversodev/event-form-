@@ -18,6 +18,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { useSupabase } from "@/providers/SupabaseProvider"
+import InputSenhaForte from "@/components/InputSenhaForte";
 
 const registerSchema = z.object({
   name: z.string()
@@ -55,7 +56,7 @@ export default function RegisterPage() {
 
   async function onSubmit(data: RegisterFormData) {
     try {
-      setLoading(true)
+      setLoading(true);
       const { error } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
@@ -65,19 +66,42 @@ export default function RegisterPage() {
             display_name: data.name,
           },
         },
-      })
-
+      });
+  
       if (error) {
-        toast.error(error.message)
-        return
+        toast.error(error.message);
+        return;
       }
-
-      toast.success('Conta criada com sucesso! Verifique seu email.')
-      router.push('/login')
+  
+      // Enviar e-mail de boas-vindas
+      // const emailResponse = await fetch('/api/emails', {
+      //   method: 'POST',
+      //   headers: {
+      //     'Content-Type': 'application/json',
+      //   },
+      //   body: JSON.stringify({
+      //     type: 'welcome',
+      //     data: {
+      //       email: data.email,
+      //       name: data.name,
+      //     },
+      //   }),
+      // });
+  
+      // const emailData = await emailResponse.json();
+  
+      // if (!emailResponse.ok) {
+      //   console.error('Erro ao enviar e-mail:', emailData);
+      //   toast.error(`Erro ao enviar e-mail de boas-vindas: ${emailData.error}`);
+      //   return;
+      // }
+  
+      toast.success('Conta criada com sucesso! Verifique seu email.');
+      router.push('/login');
     } catch (error) {
-      toast.error('Erro ao criar conta')
+      toast.error('Erro ao criar conta');
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
   }
 
@@ -130,7 +154,10 @@ export default function RegisterPage() {
                 <FormItem>
                   <FormLabel>Senha</FormLabel>
                   <FormControl>
-                    <Input type="password" {...field} />
+                    <InputSenhaForte 
+                      value={field.value}
+                      onChange={field.onChange}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

@@ -3,12 +3,9 @@
 import React from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { motion } from 'framer-motion';
 import {
   ArrowLeft,
   Download,
-  CheckCircle,
-  XCircle,
   Search,
   User,
   Trash2
@@ -16,14 +13,6 @@ import {
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -270,6 +259,12 @@ export default function EventManagement() {
           <Link href={`/events/${eventId}/check-in`} className="w-full sm:w-auto">
             <Button variant="outline" className="w-full sm:w-auto">
               Check-in
+            </Button>
+          </Link>
+
+          <Link href={`/events/${eventId}/dashboard`} className="w-full sm:w-auto">
+            <Button variant="outline" className="w-full sm:w-auto">
+              Dashboard
             </Button>
           </Link>
         </div>

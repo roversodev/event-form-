@@ -14,6 +14,8 @@ import { useRouter } from "next/navigation";
 import { useSupabase } from "@/providers/SupabaseProvider";
 import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from '@supabase/supabase-js';
+import ProfileUser from "./ProfileUser";
+import { toast } from "sonner";
 
 const Navbar = () => {
   const router = useRouter();
@@ -39,6 +41,7 @@ const Navbar = () => {
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
+    toast.success('Você saiu da sua conta!');
     router.push('/login');
   };
 
@@ -61,15 +64,8 @@ const Navbar = () => {
                   <User className="h-5 w-5" />
                 </Button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-56">
-                <div className="p-2">
-                  <p className="text-sm font-medium">{user.user_metadata.name || 'Usuário'}</p>
-                  <p className="text-xs text-muted-foreground">{user.email}</p>
-                </div>
-                <DropdownMenuItem onClick={handleSignOut} className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  <span>Sair</span>
-                </DropdownMenuItem>
+              <DropdownMenuContent align="end" className="">
+                <ProfileUser name={user.user_metadata.name} role={user.email} subscription="Free" actionLogout={handleSignOut} />
               </DropdownMenuContent>
             </DropdownMenu>
           )}

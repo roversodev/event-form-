@@ -1,6 +1,7 @@
 'use client';
 
 import React from 'react';
+import Image from 'next/image';
 import { useQuery } from '@tanstack/react-query';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -32,7 +33,6 @@ interface Event {
   description: string;
   primary_color: string;
   accent_color: string;
-  logo_url?: string;
   background_image_url?: string;
   sections: FormSection[];
 }
@@ -41,6 +41,7 @@ export default function EventForm() {
   const { eventId } = useParams();
   const [formData, setFormData] = React.useState<Record<string, any>>({});
   const [isSubmitting, setIsSubmitting] = React.useState(false);
+  const [imageLoaded, setImageLoaded] = React.useState(false);
 
   const { data: event, isLoading } = useQuery<Event>({
     queryKey: ['event', eventId],
@@ -207,26 +208,25 @@ export default function EventForm() {
             }}
           >
             {event.background_image_url && (
-              <div className="w-full h-full">
-                <img
-                  src={`${event.background_image_url}`}
+              <div className="relative w-full h-64">
+                {!imageLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+                    <Loader2 className="h-8 w-8 animate-spin" />
+                  </div>
+                )}
+                <Image
+                  src={event.background_image_url}
                   alt={`Banner do evento ${event.title}`}
-                  className="w-full h-full object-cover"
+                  fill
+                  className="object-cover"
+                  priority
+                  sizes="(max-width: 768px) 100vw, 768px"
+                  onLoad={() => setImageLoaded(true)}
                 />
               </div>
             )}
 
             <div className="p-6">
-              {event.logo_url && (
-                <div className="w-24 h-24 mb-4">
-                  <img
-                    src={`${event.logo_url}`}
-                    alt={`Logo do evento ${event.title}`}
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-              )}
-
               <h1 className="text-3xl font-bold mb-2" style={{ color: event.accent_color }}>
                 {event.title}
               </h1>
