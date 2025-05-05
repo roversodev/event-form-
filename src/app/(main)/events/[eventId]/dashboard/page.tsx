@@ -58,7 +58,11 @@ export default function EventDashboard() {
             const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
             if (!response.ok) throw new Error('Erro ao carregar evento');
             return response.json();
-        }
+        },
+        // Adiciona refetch automático a cada 30 segundos
+        refetchInterval: 30000,
+        // Também refetch quando a janela recupera o foco
+        refetchOnWindowFocus: true
     });
 
     const calculateStats = (responses: any[], period: string): DashboardStats => {
