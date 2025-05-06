@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -42,6 +42,17 @@ type RegisterFormData = z.infer<typeof registerSchema>
 export default function RegisterPage() {
   const router = useRouter()
   const supabase = useSupabase()
+  
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/dashboard')
+      }
+    }
+    
+    checkSession()
+  }, [router, supabase.auth])
   const [loading, setLoading] = useState(false)
   
   const form = useForm<RegisterFormData>({

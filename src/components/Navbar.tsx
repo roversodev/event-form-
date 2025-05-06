@@ -1,12 +1,11 @@
 'use client';
 
-import { LogOut, User } from "lucide-react";
+import { User } from "lucide-react";
 import ThemeToggleButton from "@/context/ThemeContext";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import Link from "next/link";
@@ -50,7 +49,7 @@ const Navbar = () => {
       <div className="flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-2xl font-bold bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">
-            EventForm+
+            EventFlow+
           </span>
         </Link>
         
