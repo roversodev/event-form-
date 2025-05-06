@@ -11,9 +11,9 @@ import Footer from "@/components/Footer";
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EventForm+ | Sistema de Gestão de Eventos e Formulários",
-  description: "Crie e gerencie formulários personalizados para seus eventos com uma experiência moderna e intuitiva. Organize inscrições, faça check-in e gerencie seus eventos em um só lugar.",
-  keywords: "formulário de eventos, gestão de eventos, sistema de inscrição, check-in eventos, formulários personalizados, gestão de convidados, organização de eventos, sistema de eventos, formulários online, gerenciamento de eventos",
+  title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
+  description: "Simplifique a gestão dos seus eventos com o EventFlow+. Sistema completo com formulários personalizados, check-in digital, dashboard em tempo real e gestão de convidados. A solução moderna para organizadores de eventos.",
+  keywords: "gestão de eventos, check-in digital, sistema de eventos, formulários para eventos, gerenciamento de convidados, plataforma de eventos, controle de presença, dashboard de eventos, inscrições online, organização de eventos, RSVP online, lista de convidados digital",
   authors: [{ name: "RoversoDev" }],
   icons: {
     icon: "/favicon.png",
@@ -21,29 +21,32 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "EventForm+ | Sistema de Gestão de Eventos e Formulários",
-    description: "Crie formulários personalizados para seus eventos com uma experiência moderna e intuitiva. Gerencie inscrições e faça check-in em um só lugar.",
+    title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
+    description: "Transforme a gestão dos seus eventos com formulários personalizados, check-in digital e análises em tempo real. A solução completa para organizadores de eventos modernos.",
     type: "website",
     locale: "pt_BR",
     images: [{
-      url: "https://event-form-pi.vercel.app/video/thumbnail.jpg",
+      url: "https://event-form-pi.vercel.app/dashboard.png",
       width: 1200,
       height: 630,
-      alt: "EventForm+ - Sistema de Gestão de Eventos"
+      alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
     }]
   },
   twitter: {
     card: "summary_large_image",
-    title: "EventForm+ | Sistema de Gestão de Eventos e Formulários",
-    description: "Crie formulários personalizados para seus eventos com uma experiência moderna e intuitiva. Gerencie inscrições e faça check-in em um só lugar.",
+    title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
+    description: "Transforme a gestão dos seus eventos com formulários personalizados, check-in digital e análises em tempo real. A solução completa para organizadores de eventos modernos.",
     images: [{
-      url: "https://event-form-pi.vercel.app/video/thumbnail.jpg",
+      url: "https://event-form-pi.vercel.app/dashboard.png",
       width: 1200,
       height: 630,
-      alt: "EventForm+ - Sistema de Gestão de Eventos"
+      alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
     }]
   },
-  robots: "index, follow"
+  robots: "index, follow",
+  alternates: {
+    canonical: "https://event-form-pi.vercel.app"
+  }
 };
 
 export const viewport: Viewport = {

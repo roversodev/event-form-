@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
 import { z } from "zod"
@@ -34,6 +34,17 @@ export default function LoginPage() {
   const router = useRouter()
   const supabase = useSupabase()
   const [loading, setLoading] = useState(false)
+  
+  useEffect(() => {
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        router.push('/dashboard')
+      }
+    }
+    
+    checkSession()
+  }, [router, supabase.auth])
   
   const form = useForm<LoginFormData>({
     resolver: zodResolver(loginSchema),
