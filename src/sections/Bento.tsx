@@ -3,7 +3,8 @@ import { cn } from "@/lib/utils";
 import createGlobe from "cobe";
 import { useEffect, useRef } from "react";
 import { motion } from "motion/react";
-import { IconBrandYoutubeFilled } from "@tabler/icons-react";
+import * as variant from '@/lib/motionVariants';
+
 
 
 export function Bento() {
@@ -42,14 +43,22 @@ export function Bento() {
   return (
     <div className="relative z-20 py-10 lg:py-40 max-w-7xl mx-auto">
       <div className="px-8">
-        <h4 className="text-3xl lg:text-5xl lg:leading-tight max-w-5xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
+        <motion.h4
+        variants={variant.fadeInUp}
+        initial="start"
+        whileInView='end'
+        className="text-3xl lg:text-5xl lg:leading-tight max-w-5xl mx-auto text-center tracking-tight font-medium text-black dark:text-white">
           Repleto de diversos de recursos
-        </h4>
+        </motion.h4>
 
-        <p className="text-sm lg:text-base  max-w-2xl  my-4 mx-auto text-neutral-500 text-center font-normal dark:text-neutral-300">
+        <motion.p
+        variants={variant.fadeInLeft}
+        initial="start"
+        whileInView='end'
+        className="text-sm lg:text-base  max-w-2xl  my-4 mx-auto text-neutral-500 text-center font-normal dark:text-neutral-300">
           Gerencie seus eventos com facilidade através de recursos como formulários personalizados, 
           controle de inscrições, e análise de dados em tempo real.
-        </p>
+        </motion.p>
       </div>
 
       <div className="relative ">
@@ -75,9 +84,13 @@ const FeatureCard = ({
   className?: string;
 }) => {
   return (
-    <div className={cn(`p-4 sm:p-8 relative overflow-hidden h-full`, className)}>
+    <motion.div
+    variants={variant.fadeInUp}
+    initial="start"
+    whileInView='end'
+    className={cn(`p-4 sm:p-8 relative overflow-hidden h-full`, className)}>
       {children}
-    </div>
+    </motion.div>
   );
 };
 
@@ -166,11 +179,7 @@ export const SkeletonThree = () => {
               {Array.from({ length: 16 }).map((_, i) => (
                 <div
                   key={i}
-                  className={`h-3 w-3 rounded-sm ${
-                    Math.random() > 0.5
-                      ? "bg-primary"
-                      : "bg-transparent"
-                  }`}
+                  className="h-3 w-3 rounded-sm bg-primary"
                 />
               ))}
             </div>

@@ -123,4 +123,7 @@
   purple {
     @apply bg-purple-600;
   }
+  .logo-ticker {
+    @apply h-32 w-auto;
+  }
 }

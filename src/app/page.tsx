@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { Bento } from '@/sections/Bento';
 import Hero2 from '@/sections/Hero2';
+import { LogoTicker } from '@/sections/LogoTicker';
 
 const Index = () => {
   const [isHovered, setIsHovered] = useState(false);
@@ -39,6 +40,8 @@ const Index = () => {
       
       <main className="flex-1 ">
         <Hero2 />
+
+        <LogoTicker />
 
         <Bento />
 
