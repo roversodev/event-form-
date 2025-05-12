@@ -11,6 +11,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import { toast } from 'sonner';
+import { UserSubscription } from '@/types/subscription';
 
 interface Event {
   id: string;
@@ -27,6 +28,10 @@ const Dashboard = () => {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [copiedEventId, setCopiedEventId] = React.useState<string | null>(null);
 
+  // Adicionar estado para o plano do usuário
+  // const [userSubscription, setUserSubscription] = React.useState<UserSubscription | null>(null);
+
+  // Modificar a query para incluir a verificação de assinatura
   const { data: events = [], isLoading: eventsLoading } = useQuery<Event[]>({
     queryKey: ['events'],
     queryFn: async () => {
@@ -37,6 +42,11 @@ const Dashboard = () => {
         return [];
       }
 
+      // Buscar a assinatura do usuário
+      // const subscriptionResponse = await fetch('/api/subscription');
+      // const subscriptionData = await subscriptionResponse.json();
+      // setUserSubscription(subscriptionData);
+
       const response = await fetch('/api/events');
       if (!response.ok) {
         throw new Error('Falha ao carregar eventos');
@@ -44,6 +54,27 @@ const Dashboard = () => {
       return response.json();
     }
   });
+
+  // Função para verificar se pode criar novo formulário
+  // const canCreateNewForm = () => {
+  //   if (!userSubscription || userSubscription.plan === 'free') {
+  //     return events.length < 1;
+  //   }
+  //   if (userSubscription.plan === 'pro') {
+  //     return events.length < 5;
+  //   }
+  //   return true; // Enterprise tem formulários ilimitados
+  // };
+
+  // Modificar o botão de novo evento
+  const handleNewEventClick = () => {
+    // if (!canCreateNewForm()) {
+    //   toast.error('Você atingiu o limite de formulários do seu plano. Faça upgrade para criar mais!');
+    //   router.push('/pricing');
+    //   return;
+    // }
+    router.push('/new-event');
+  };
 
   const filteredEvents = events.filter((event) =>
     event.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -56,8 +87,7 @@ const Dashboard = () => {
       toast.success('Link copiado para a área de transferência!');
       setTimeout(() => setCopiedEventId(null), 2000); // Resetar após 2 segundos
     }).catch(err => {
-      console.error('Erro ao copiar o link: ', err);
-    });
+      console.error('Erro ao copiar o link: ', err);  });
   };
 
   return (
@@ -80,12 +110,10 @@ const Dashboard = () => {
               />
             </div>
 
-            <Link href="/new-event">
-              <Button>
-                <Plus className="h-4 w-4 mr-2" />
-                Novo Evento
-              </Button>
-            </Link>
+            <Button onClick={handleNewEventClick}>
+              <Plus className="h-4 w-4 mr-2" />
+              Novo Evento
+            </Button>
           </div>
         </div>
 

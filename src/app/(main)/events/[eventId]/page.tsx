@@ -26,6 +26,7 @@ import {
 } from "@/components/ui/dialog";
 import { toast } from 'sonner';
 import { ResponseDataTable } from '@/components/ResponsesTable';
+import { useSupabase } from '@/providers/SupabaseProvider';
 
 
 interface FormResponse {
@@ -58,10 +59,17 @@ export default function EventManagement() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedResponse, setSelectedResponse] = React.useState<FormResponse | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const supabase = useSupabase();
 
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event', eventId],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+         
+         if (!session) {
+           router.push('/login');
+           return [];
+         }
       const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
       if (!response.ok) throw new Error('Erro ao carregar evento');
       return response.json();

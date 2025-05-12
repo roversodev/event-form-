@@ -1,9 +1,9 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
-import { ArrowLeft, Users, CalendarCheck, CheckCircle2, TrendingUp, Lightbulb, TrendingDown } from 'lucide-react';
+import { ArrowLeft, Users, CalendarCheck, CheckCircle2, TrendingUp, Lightbulb } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -28,6 +28,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import { useSupabase } from '@/providers/SupabaseProvider';
 
 
 
@@ -51,10 +52,18 @@ interface DashboardStats {
 export default function EventDashboard() {
     const { eventId } = useParams();
     const [selectedPeriod, setSelectedPeriod] = React.useState('all');
+    const supabase = useSupabase();
+    const router = useRouter();
 
     const { data: event, isLoading } = useQuery({
         queryKey: ['event', eventId],
         queryFn: async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+         
+            if (!session) {
+                router.push('/login');
+                return [];
+            }
             const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
             if (!response.ok) throw new Error('Erro ao carregar evento');
             return response.json();
