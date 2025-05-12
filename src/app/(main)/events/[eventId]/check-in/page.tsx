@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -23,6 +23,7 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { useSupabase } from '@/providers/SupabaseProvider';
 
 interface Response {
   id: string;
@@ -54,10 +55,19 @@ export default function CheckInPage() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedResponse, setSelectedResponse] = React.useState<Response | null>(null);
   const [isCheckingIn, setIsCheckingIn] = React.useState(false);
+  const supabase = useSupabase();
+  const router = useRouter();
+  
 
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event-check-in', eventId],
     queryFn: async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+         
+            if (!session) {
+                router.push('/login');
+                return [];
+            }
       const response = await fetch(`/api/events/${eventId}/check-in`);
       if (!response.ok) throw new Error('Erro ao carregar evento');
       return response.json();

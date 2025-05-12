@@ -1,3 +1,4 @@
+'use client';
 import { AnimatedShinyText } from '@/components/magicui/animated-shiny-text'
 import HeroVideoDialog from '@/components/magicui/hero-video-dialog'
 import { motion } from 'framer-motion'
