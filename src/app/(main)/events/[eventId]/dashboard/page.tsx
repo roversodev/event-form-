@@ -79,7 +79,12 @@ export default function EventDashboard() {
         let filteredResponses = [...responses];
 
         // Filtra as respostas baseado no período selecionado
-        if (period !== 'all') {
+        if (period === 'today') {
+            filteredResponses = responses.filter(response => {
+                const responseDate = new Date(response.created_at);
+                return isSameDay(responseDate, today);
+            });
+        } else if (period !== 'all') {
             const daysToSubtract = parseInt(period);
             const startDate = new Date();
             startDate.setDate(today.getDate() - daysToSubtract);
@@ -177,14 +182,16 @@ export default function EventDashboard() {
                     defaultValue="all" 
                     onValueChange={(value) => setSelectedPeriod(value)}
                 >
-                    <SelectTrigger className="w-[180px]">
+                    <SelectTrigger className="w-[180px] cursor-pointer">
                         <SelectValue placeholder="Período" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="all">Todo período</SelectItem>
-                        <SelectItem value="7">Últimos 7 dias</SelectItem>
-                        <SelectItem value="15">Últimos 15 dias</SelectItem>
-                        <SelectItem value="30">Últimos 30 dias</SelectItem>
+                        <SelectItem value="today" className='cursor-pointer'>Hoje</SelectItem>
+                        <SelectItem value="7" className='cursor-pointer'>Últimos 7 dias</SelectItem>
+                        <SelectItem value="15" className='cursor-pointer'>Últimos 15 dias</SelectItem>
+                        <SelectItem value="30" className='cursor-pointer'>Últimos 30 dias</SelectItem>
+                        <SelectItem value="90" className='cursor-pointer'>Últimos 3 meses</SelectItem>
+                        <SelectItem value="all" className='cursor-pointer'>Todo período</SelectItem>
                     </SelectContent>
                 </Select>
             </div>

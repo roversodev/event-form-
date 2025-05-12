@@ -1,60 +1,35 @@
 import { Button } from "@/components/ui/button";
-import Glow from "@/components/ui/glow";
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import Image from "next/image";
+import Link from "next/link";
 
-interface CTAButtonProps {
-    href: string;
-    text: string;
-    variant?: string;
-    icon?: ReactNode;
-    iconRight?: ReactNode;
-}
-
-interface CTAProps {
-    title?: string;
-    buttons?: CTAButtonProps[] | false;
-    className?: string;
-}
-
-export default function CTA({
-    title = "Comece a criar agora",
-    buttons = [
-        {
-            href: "/dashboard",
-            text: "Começar Grátis",
-            variant: "default",
-        },
-    ],
-    className,
-}: CTAProps) {
+export default function CTA({ }) {
     return (
-        <section className={cn("group relative overflow-hidden py-32", className)}>
-            <div className="max-w-container relative z-10 mx-auto flex flex-col items-center gap-6 text-center sm:gap-8">
-                <h2 className="max-w-[640px] text-3xl leading-tight font-semibold sm:text-5xl sm:leading-tight">
-                    {title}
-                </h2>
-                {buttons !== false && buttons.length > 0 && (
-                    <div className="flex justify-center gap-4">
-                        {buttons.map((button, index) => (
-                            <Button
-                                key={index}
-                                variant={(button.variant as "default" | "link" | "destructive" | "outline" | "secondary" | "ghost") || "default"}
-                                size="lg"
-                                asChild
-                            >
-                                <a href={button.href}>
-                                    {button.icon}
-                                    {button.text}
-                                    {button.iconRight}
-                                </a>
-                            </Button>
-                        ))}
+        <section id="cta" className="flex flex-col items-center justify-center w-full max-w-7xl mx-auto">
+            <div className="w-full">
+                <div
+                    className="h-[400px] md:h-[400px] overflow-hidden shadow-xl w-full border border-border rounded-xl bg-purple-600 relative z-20">
+                    <Image alt="CTA fundo" decoding="async" data-nimg="fill"
+                        className="absolute inset-0 w-full h-full object-cover object-right md:object-center"
+                        width={1000}
+                        height={1000}
+                        src="/cta-bg.webp" />
+                    <div className="absolute inset-0 -top-32 md:-top-40 flex flex-col items-center justify-center">
+                        <h1
+                            className="text-white text-4xl md:text-7xl font-medium tracking-tighter max-w-xs md:max-w-xl text-center">
+                            Automatize. Simplifique.
+                        </h1>
+                        <div className="absolute bottom-10 flex flex-col items-center justify-center gap-2">
+                            <Link href="/login">
+                                <Button size="lg">
+                                    Começe agora gratuitamente
+                                </Button>
+                            </Link>
+                            <span className="text-white text-sm">
+                                Cancele a qualquer momento, sem perguntas
+                            </span>
+                        </div>
                     </div>
-                )}
-            </div>
-            <div className="absolute top-0 left-0 h-full w-full translate-y-[1rem] opacity-80 transition-all duration-500 ease-in-out group-hover:translate-y-[-2rem] group-hover:opacity-100">
-                <Glow variant="bottom" />
+                </div>
             </div>
         </section>
     );

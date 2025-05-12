@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/card";
 import { MagicCard } from "@/components/magicui/magic-card"
 import { useTheme } from "next-themes"
+import { motion } from "framer-motion";
+import * as variant from "@/lib/motionVariants";
 
 const pricingPlans = [
     {
@@ -18,37 +20,38 @@ const pricingPlans = [
         description: "Para quem está começando",
         price: 0,
         features: [
-            "Até 1 formulário",
-            "Página do evento personalizada",
-            "Suporte por email",
-            "Exportação em excel",
-            "Check-in dos participantes",
+            // "Até 1 formulário",
+            // "Página do evento personalizada",
+            // "Suporte por email",
+            // "Exportação em excel",
+            // "Check-in dos participantes",
+            "Todas as funcionalidades liberadas no BETA da nossa plataforma",
         ]
     },
-    {
-        name: "Profissional",
-        description: "Para quem organiza diversos eventos",
-        price: 49,
-        features: [
-            "Tudo do BÁSICO",
-            "Até 5 formulários",
-            "Suporte prioritário",
-            "Exportação em excel",
-            "Dashboard com insights",
-        ]
-    },
-    {
-        name: "Enterprise",
-        description: "Para quem está em grande escala",
-        price: 97,
-        features: [
-            "Tudo do PRO",
-            "Fomulários ilimitados",
-            "Treinamento completo",
-            "Suporte 24/7",
-            "API access",
-        ]
-    }
+    // {
+    //     name: "Profissional",
+    //     description: "Para quem organiza diversos eventos",
+    //     price: 49,
+    //     features: [
+    //         "Tudo do BÁSICO",
+    //         "Até 5 formulários",
+    //         "Suporte prioritário",
+    //         "Exportação em excel",
+    //         "Dashboard com insights",
+    //     ]
+    // },
+    // {
+    //     name: "Enterprise",
+    //     description: "Para quem está em grande escala",
+    //     price: 97,
+    //     features: [
+    //         "Tudo do PRO",
+    //         "Fomulários ilimitados",
+    //         "Treinamento completo",
+    //         "Suporte 24/7",
+    //         "API access",
+    //     ]
+    // }
 ]
 
 export const Pricing = () => {
@@ -57,14 +60,22 @@ export const Pricing = () => {
     return (
         <section className="py-20 px-8">
             <div className="max-w-7xl mx-auto">
-                <div className="text-center mb-16">
-                    <h2 className="text-3xl lg:text-5xl font-medium">
+                <motion.div
+                variants={variant.staggerContainer}
+                initial="start"
+                whileInView='end'
+                className="text-center mb-16">
+                    <motion.h2
+                    variants={variant.fadeInUp}
+                    className="text-3xl lg:text-5xl font-medium">
                         Escolha o plano ideal para você
-                    </h2>
-                    <p className="text-neutral-500 dark:text-neutral-400 mt-4">
+                    </motion.h2>
+                    <motion.p
+                    variants={variant.fadeInLeft}
+                    className="text-neutral-500 dark:text-neutral-400 mt-4">
                         Planos flexíveis que crescem junto com seu evento
-                    </p>
-                </div>
+                    </motion.p>
+                </motion.div>
 
                 <div className="grid md:grid-cols-3 gap-8">
                     {pricingPlans.map((plan, index) => (
