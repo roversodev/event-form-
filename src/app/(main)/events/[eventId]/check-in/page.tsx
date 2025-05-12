@@ -5,7 +5,7 @@ import { useParams, useRouter } from 'next/navigation';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Search, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { Search, CheckCircle, XCircle, Loader2, ArrowLeft } from 'lucide-react';
 import {
   Table,
   TableBody,
@@ -24,6 +24,7 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { useSupabase } from '@/providers/SupabaseProvider';
+import Link from 'next/link';
 
 interface Response {
   id: string;
@@ -57,17 +58,17 @@ export default function CheckInPage() {
   const [isCheckingIn, setIsCheckingIn] = React.useState(false);
   const supabase = useSupabase();
   const router = useRouter();
-  
+
 
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event-check-in', eventId],
     queryFn: async () => {
       const { data: { session } } = await supabase.auth.getSession();
-         
-            if (!session) {
-                router.push('/login');
-                return [];
-            }
+
+      if (!session) {
+        router.push('/login');
+        return [];
+      }
       const response = await fetch(`/api/events/${eventId}/check-in`);
       if (!response.ok) throw new Error('Erro ao carregar evento');
       return response.json();
@@ -136,23 +137,30 @@ export default function CheckInPage() {
 
   if (isLoading) {
     return (
-        <div className="container mx-auto px-4 py-8 min-h-[80vh]">
-          <Skeleton className="h-8 w-64 mb-4" />
-          <Skeleton className="h-4 w-96 mb-8" />
-          <div className="space-y-4">
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-            <Skeleton className="h-12 w-full" />
-          </div>
+      <div className="container mx-auto px-4 py-8 min-h-[80vh]">
+        <Skeleton className="h-8 w-64 mb-4" />
+        <Skeleton className="h-4 w-96 mb-8" />
+        <div className="space-y-4">
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
+          <Skeleton className="h-12 w-full" />
         </div>
-      );
+      </div>
+    );
   }
 
   return (
     <div className="container mx-auto px-4 py-8 min-h-[80vh]">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold mb-2">{event?.title}</h1>
-        <p className="text-muted-foreground">Gerenciamento de Check-in</p>
+      <div className="flex items-center gap-4 mb-8">
+        <Link href={`/events/${eventId}`}>
+          <Button variant="outline" size="icon">
+            <ArrowLeft className="h-4 w-4" />
+          </Button>
+        </Link>
+        <div>
+          <h1 className="text-3xl font-bold mb-2">{event?.title}</h1>
+          <p className="text-muted-foreground">Gerenciamento de Check-in</p>
+        </div>
       </div>
 
       <div className="flex items-center gap-4 mb-6">
@@ -221,12 +229,12 @@ export default function CheckInPage() {
           <DialogHeader>
             <DialogTitle>Confirmar Check-in</DialogTitle>
           </DialogHeader>
-          
+
           <div className="py-4">
             <h3 className="text-lg font-semibold mb-4">
               {selectedResponse?.respondent_name}
             </h3>
-            
+
             <div className="space-y-6">
               {selectedResponse && formatResponseData(selectedResponse.responses)?.map((section, index) => (
                 <div key={index} className="space-y-3 border-b pb-4 last:border-b-0">
