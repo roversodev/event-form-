@@ -64,12 +64,6 @@ export default function EventManagement() {
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event', eventId],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-         
-         if (!session) {
-           router.push('/login');
-           return [];
-         }
       const response = await fetch(`/api/events/${eventId}?includeResponses=true`);
       if (!response.ok) throw new Error('Erro ao carregar evento');
       return response.json();
