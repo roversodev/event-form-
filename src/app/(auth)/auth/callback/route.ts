@@ -13,6 +13,14 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // URL para redirecionar após o login
-  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
+  // Pega a URL base da requisição atual
+  const baseUrl = requestUrl.origin;
+  
+  // Se estiver em localhost, usa a URL como está
+  // Se estiver em produção, usa a URL de produção
+  const redirectUrl = baseUrl.includes('localhost') 
+    ? new URL('/dashboard', baseUrl)
+    : new URL('/dashboard', process.env.NEXT_PUBLIC_SITE_URL || baseUrl);
+
+  return NextResponse.redirect(redirectUrl);
 }
