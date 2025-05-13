@@ -108,6 +108,7 @@ const Navbar = () => {
                       role={user.email} 
                       subscription="Free" 
                       actionLogout={handleSignOut} 
+                      avatar={user.user_metadata.picture} 
                     />
                   </DropdownMenuContent>
                 </DropdownMenu>
@@ -161,6 +162,7 @@ const Navbar = () => {
                         role={user.email} 
                         subscription="Free" 
                         actionLogout={handleSignOut} 
+                        avatar=""
                       />
                     </div>
                   )}
