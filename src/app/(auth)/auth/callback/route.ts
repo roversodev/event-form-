@@ -5,6 +5,8 @@ import { NextResponse } from 'next/server';
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get('code');
+  console.log('Request URL:', requestUrl.toString());
+  console.log('Origin:', requestUrl.origin);
 
   if (code) {
     const cookieStore = cookies();
@@ -13,14 +15,6 @@ export async function GET(request: Request) {
     await supabase.auth.exchangeCodeForSession(code);
   }
 
-  // Pega a URL base da requisição atual
-  const baseUrl = requestUrl.origin;
-  
-  // Se estiver em localhost, usa a URL como está
-  // Se estiver em produção, usa a URL de produção
-  const redirectUrl = baseUrl.includes('localhost') 
-    ? new URL('/dashboard', baseUrl)
-    : new URL('/dashboard', process.env.NEXT_PUBLIC_SITE_URL || baseUrl);
-
-  return NextResponse.redirect(redirectUrl);
+  // Redireciona sempre para a origem da requisição
+  return NextResponse.redirect(new URL('/dashboard', requestUrl.origin));
 }
