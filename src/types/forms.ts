@@ -16,7 +16,7 @@ export interface FormField {
   label: string;
   placeholder?: string;
   required: boolean;
-  options?: string[]; // For select, checkbox, radio
+  options?: string[];
   defaultValue?: string;
 }
 
