@@ -35,12 +35,6 @@ const Dashboard = () => {
   const { data: events = [], isLoading: eventsLoading } = useQuery<Event[]>({
     queryKey: ['events'],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
-      
-      if (!session) {
-        router.push('/login');
-        return [];
-      }
 
       // Buscar a assinatura do usuário
       // const subscriptionResponse = await fetch('/api/subscription');

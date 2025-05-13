@@ -56,19 +56,12 @@ export default function CheckInPage() {
   const [searchTerm, setSearchTerm] = React.useState('');
   const [selectedResponse, setSelectedResponse] = React.useState<Response | null>(null);
   const [isCheckingIn, setIsCheckingIn] = React.useState(false);
-  const supabase = useSupabase();
-  const router = useRouter();
 
 
   const { data: event, isLoading, refetch } = useQuery<Event>({
     queryKey: ['event-check-in', eventId],
     queryFn: async () => {
-      const { data: { session } } = await supabase.auth.getSession();
 
-      if (!session) {
-        router.push('/login');
-        return [];
-      }
       const response = await fetch(`/api/events/${eventId}/check-in`);
       if (!response.ok) throw new Error('Erro ao carregar evento');
       return response.json();
