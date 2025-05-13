@@ -1,56 +1,95 @@
-'use client';
-
+import { InfiniteSlider } from "@/components/motion-primitives/infinite-slider"
+import { ProgressiveBlur } from "@/components/motion-primitives/progressive-blur"
 import discotecaLogo from '@/assets/DISCOTECA-LOGO1-gray.png'
 import illusionLogo from '@/assets/ILLUSION LOGOTIPO-gray.png'
 import discotecaLogo2 from '@/assets/DISCOTECA-LOGO2-gray.png'
-import discotecaLogo3 from '@/assets/DISCOTECA-LOGO1-gray.png'
-import illusionLogo2 from '@/assets/ILLUSION LOGOTIPO-gray.png'
-import discotecaLogo4 from'@/assets/DISCOTECA-LOGO2-gray.png'
-import Image from 'next/image'
-import {motion} from "framer-motion";
 
-export const LogoTicker = () => {
+export default function LogoCloud() {
   return (
-    <div className='py-8 md:py-12'>
-      <div className="container">
-        <div className=" flex overflow-hidden [mask-image:linear-gradient(to_right,transparent,black,transparent)]">
-          <motion.div className="flex gap-14 pr-14 flex-none items-center" animate={{
-            translateX: "-50%",
-          }}
-          transition={{
-            repeat: Infinity,
-            repeatType: "loop",
-            duration: 20,
-            ease: "linear",
-          }}
-          >
-            <Image src={discotecaLogo} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo2} alt="discoteca" className='logo-ticker' />
-            <Image src={discotecaLogo3} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo2} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo4} alt="discoteca" className='logo-ticker' />
+    <section className="bg-background overflow-hidden py-16">
+      <div className="group relative m-auto max-w-7xl px-6">
+        <div className="flex flex-col items-center md:flex-row">
+          <div className="md:max-w-44 md:border-r md:pr-6">
+            <p className="text-end text-sm">Confiado pelas melhores festas</p>
+          </div>
+          <div className="relative py-6 md:w-[calc(100%-11rem)]">
+            <InfiniteSlider speedOnHover={20} speed={40} gap={112}>
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker dark:invert"
+                  src={discotecaLogo.src}
+                  alt="Discoteca Logo"
+                  height="20"
+                  width="auto"
+                />
+              </div>
 
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker h-8 dark:invert"
+                  src={illusionLogo.src}
+                  alt="Illusion Logo"
+                  height="16"
+                  width="auto"
+                />
+              </div>
 
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker dark:invert"
+                  src={discotecaLogo2.src}
+                  alt="Discoteca logo"
+                  height="16"
+                  width="auto"
+                />
+              </div>
 
-            <Image src={discotecaLogo} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo2} alt="discoteca" className='logo-ticker' />
-            <Image src={discotecaLogo3} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo2} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo4} alt="discoteca" className='logo-ticker' />
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker dark:invert"
+                  src={discotecaLogo.src}
+                  alt="Discoteca Logo"
+                  height="20"
+                  width="auto"
+                />
+              </div>
 
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker h-8 dark:invert"
+                  src={illusionLogo.src}
+                  alt="Illusion Logo"
+                  height="16"
+                  width="auto"
+                />
+              </div>
 
+              <div className="flex items-center">
+                <img
+                  className="mx-auto logo-ticker dark:invert"
+                  src={discotecaLogo2.src}
+                  alt="Discoteca logo"
+                  height="16"
+                  width="auto"
+                />
+              </div>
+            </InfiniteSlider>
 
-            <Image src={discotecaLogo} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo2} alt="discoteca" className='logo-ticker' />
-            <Image src={discotecaLogo3} alt="discoteca" className='logo-ticker' />
-            <Image src={illusionLogo2} alt="illusion" className='logo-ticker h-8' />
-            <Image src={discotecaLogo4} alt="discoteca" className='logo-ticker' />
-          </motion.div>
+            <div className="bg-linear-to-r from-background absolute inset-y-0 left-0 w-20"></div>
+            <div className="bg-linear-to-l from-background absolute inset-y-0 right-0 w-20"></div>
+            <ProgressiveBlur
+              className="pointer-events-none absolute left-0 top-0 h-full w-20"
+              direction="left"
+              blurIntensity={1}
+            />
+            <ProgressiveBlur
+              className="pointer-events-none absolute right-0 top-0 h-full w-20"
+              direction="right"
+              blurIntensity={1}
+            />
+          </div>
         </div>
       </div>
-    </div>
-  );
-};
+    </section>
+  )
+}
