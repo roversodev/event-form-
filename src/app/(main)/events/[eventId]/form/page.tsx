@@ -208,26 +208,27 @@ export default function EventForm() {
             }}
           >
             {event.background_image_url && (
-              <div className="relative w-full h-64">
+              <div className="relative w-full">
                 {!imageLoaded && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-muted/20">
+                  <div className="absolute inset-0 flex items-center justify-center bg-muted/20 min-h-[400px]">
                     <Loader2 className="h-8 w-8 animate-spin" />
                   </div>
                 )}
                 <Image
                   src={event.background_image_url}
                   alt={`Banner do evento ${event.title}`}
-                  fill
-                  className="object-cover"
+                  width={0}
+                  height={0}
+                  sizes="100vw"
+                  className="w-full h-auto"
                   priority
-                  sizes="(max-width: 768px) 100vw, 768px"
                   onLoad={() => setImageLoaded(true)}
                 />
               </div>
             )}
 
             <div className="p-6">
-              <h1 className="text-3xl font-bold mb-2" style={{ color: event.accent_color }}>
+              <h1 className="text-3xl font-bold mb-2">
                 {event.title}
               </h1>
               <p className="text-muted-foreground">{event.description}</p>
