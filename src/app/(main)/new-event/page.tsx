@@ -14,7 +14,7 @@ import type { User } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
 
 
-type FieldType = 'text' | 'email' | 'number' | 'phone' | 'date' | 'select' | 'checkbox' | 'radio' | 'textarea' | 'file';
+type FieldType = 'text' | 'email' | 'number' | 'phone' | 'date' | 'select' | 'checkbox' | 'radio' | 'textarea';
 
 interface FormField {
   id: string;
@@ -90,7 +90,6 @@ const NewEvent = () => {
     { type: 'checkbox', label: 'Checkbox', icon: '✓' },
     { type: 'radio', label: 'Opções', icon: '◉' },
     { type: 'textarea', label: 'Área de Texto', icon: '¶' },
-    { type: 'file', label: 'Arquivo', icon: '📎' },
   ]);
 
   const handleBackgroundChange = (e: React.ChangeEvent<HTMLInputElement>) => {
