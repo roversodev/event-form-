@@ -10,6 +10,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { toast } from 'sonner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
+import { Checkbox } from '@/components/ui/checkbox';
 
 interface FormField {
   id: string;
@@ -98,6 +102,19 @@ export default function EventForm() {
   };
 
   const renderField = (field: FormField) => {
+    // Função auxiliar para fazer o parse das opções
+    const parseOptions = (options?: string | string[]) => {
+      if (!options) return [];
+      if (Array.isArray(options)) return options;
+      try {
+        return JSON.parse(options);
+      } catch {
+        return [];
+      }
+    };
+
+    const fieldOptions = parseOptions(field.options);
+
     switch (field.type) {
       case 'text':
       case 'email':
@@ -123,38 +140,38 @@ export default function EventForm() {
         );
       case 'select':
         return (
-          <select
-            className="w-full rounded-md border border-input bg-background px-3 py-2"
+          <Select
             value={formData[field.id] || ''}
-            onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+            onValueChange={(value) => setFormData({ ...formData, [field.id]: value })}
             required={field.required}
           >
-            <option value="">Selecione uma opção</option>
-            {field.options?.map((option) => (
-              <option key={option} value={option}>
-                {option}
-              </option>
-            ))}
-          </select>
+            <SelectTrigger className='w-full'>
+              <SelectValue placeholder="Selecione uma opção" />
+            </SelectTrigger>
+            <SelectContent>
+              {fieldOptions.map((option: string) => (
+                <SelectItem key={option} value={option}>
+                  {option}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         );
       case 'radio':
         return (
           <div className="space-y-2">
-            {field.options?.map((option) => (
-              <div key={option} className="flex items-center gap-2">
-                <input
-                  type="radio"
-                  id={`${field.id}-${option}`}
-                  name={field.id}
-                  value={option}
-                  checked={formData[field.id] === option}
-                  onChange={(e) => setFormData({ ...formData, [field.id]: e.target.value })}
+            {fieldOptions.map((option: string) => (
+              <div key={option} className="flex items-center space-x-2">
+                <RadioGroup
+                  value={formData[field.id] || ''}
+                  onValueChange={(value) => setFormData({ ...formData, [field.id]: value })}
                   required={field.required}
-                  className="h-4 w-4 border-input"
-                />
-                <label htmlFor={`${field.id}-${option}`} className="text-sm">
-                  {option}
-                </label>
+                >
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value={option} id={`${field.id}-${option}`} />
+                    <Label htmlFor={`${field.id}-${option}`}>{option}</Label>
+                  </div>
+                </RadioGroup>
               </div>
             ))}
           </div>
@@ -162,26 +179,23 @@ export default function EventForm() {
       case 'checkbox':
         return (
           <div className="space-y-2">
-            {field.options?.map((option) => {
+            {fieldOptions.map((option: string) => {
               const values = formData[field.id] || [];
               return (
-                <div key={option} className="flex items-center gap-2">
-                  <input
-                    type="checkbox"
+                <div key={option} className="flex items-center space-x-2">
+                  <Checkbox
                     id={`${field.id}-${option}`}
-                    value={option}
                     checked={values.includes(option)}
-                    onChange={(e) => {
-                      const newValues = e.target.checked
+                    onCheckedChange={(checked) => {
+                      const newValues = checked
                         ? [...values, option]
                         : values.filter((v: string) => v !== option);
                       setFormData({ ...formData, [field.id]: newValues });
                     }}
-                    className="h-4 w-4 rounded border-input"
                   />
-                  <label htmlFor={`${field.id}-${option}`} className="text-sm">
+                  <Label htmlFor={`${field.id}-${option}`}>
                     {option}
-                  </label>
+                  </Label>
                 </div>
               );
             })}
