@@ -161,8 +161,8 @@ const Navbar = () => {
                         name={user.user_metadata.name} 
                         role={user.email} 
                         subscription="Free" 
-                        actionLogout={handleSignOut} 
-                        avatar=""
+                        actionLogout={handleSignOut}
+                        avatar={user.user_metadata.picture}
                       />
                     </div>
                   )}
