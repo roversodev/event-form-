@@ -22,6 +22,7 @@ import { useEffect, useState } from "react";
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import ProfileUser from "./ProfileUser";
 import { toast } from "sonner";
+import LogoEF from "./LogoEF";
 
 const Navbar = () => {
   const router = useRouter();
@@ -64,14 +65,7 @@ const Navbar = () => {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center justify-between">
             {/* Logo */}
-            <Link 
-              href="/" 
-              className="flex items-center gap-2 relative z-10"
-            >
-              <span className="text-2xl font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent bg-[length:200%_auto] hover:bg-right transition-all duration-500">
-                EventFlow+
-              </span>
-            </Link>
+            <LogoEF />
 
             {/* Links de Navegação - Desktop */}
             <div className="hidden md:flex items-center gap-6">
