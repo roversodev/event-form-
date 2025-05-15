@@ -7,6 +7,7 @@ import SupabaseProvider from "@/providers/SupabaseProvider";
 import QueryProvider from "@/providers/QueryProvider";
 import { ThemeProvider } from "next-themes";
 import Footer from "@/components/Footer";
+import { SupportButton } from "@/components/SupportButton";
 
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
@@ -26,7 +27,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "pt_BR",
     images: [{
-      url: "https://event-form-pi.vercel.app/dashboard.png",
+      url: "https://eventflow.roversodev.com.br/dashboard.png",
       width: 1200,
       height: 630,
       alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
@@ -37,7 +38,7 @@ export const metadata: Metadata = {
     title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
     description: "Transforme a gestão dos seus eventos com formulários personalizados, check-in digital e análises em tempo real. A solução completa para organizadores de eventos modernos.",
     images: [{
-      url: "https://event-form-pi.vercel.app/dashboard.png",
+      url: "https://eventflow.roversodev.com.br/dashboard.png",
       width: 1200,
       height: 630,
       alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
@@ -45,7 +46,7 @@ export const metadata: Metadata = {
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://event-form-pi.vercel.app"
+    canonical: "https://eventflow.roversodev.com.br"
   }
 };
 
@@ -60,7 +61,6 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <html lang="pt-br" suppressHydrationWarning>
       <body
@@ -76,8 +76,9 @@ export default async function RootLayout({
           >
             <Navbar />
             {children}
-            <Toaster />
             <Footer />
+            <SupportButton />
+            <Toaster />
             </ThemeProvider>
           </QueryProvider>
         </SupabaseProvider>

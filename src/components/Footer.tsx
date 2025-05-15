@@ -1,5 +1,6 @@
 import { Heart, Twitter, Github, Linkedin } from "lucide-react"
 import Link from "next/link"
+import LogoEF from "./LogoEF"
 
 const Footer = () => {
     return (
@@ -9,9 +10,7 @@ const Footer = () => {
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">
                     {/* Coluna 1: Logo e Descrição */}
                     <div className="space-y-4">
-                        <h3 className="text-xl font-bold bg-gradient-to-r from-primary to-primary/50 bg-clip-text text-transparent">
-                            EventFlow+
-                        </h3>
+                        <LogoEF />
                         <p className="text-sm text-muted-foreground">
                             Transformando a maneira como você gerencia seus eventos, um formulário por vez.
                         </p>
@@ -77,7 +76,7 @@ const Footer = () => {
                 {/* Copyright e Créditos */}
                 <div className="flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground">
                     <p className="flex items-center gap-1 mb-4 sm:mb-0">
-                        <span>© 2025 EventForm+</span>
+                        <span>© 2025 EventFlow+</span>
                         <span className="inline-flex items-center">
                             feito com <Heart className="h-4 w-4 fill-primary mx-1" /> por
                         </span>
