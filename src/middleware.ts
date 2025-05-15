@@ -26,7 +26,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/events/:path*', '/login', '/register'],
+  matcher: ['/dashboard/:path*', '/events/:path*', '/login', '/register', '/new-event', '/pricing'],
 };
 
 export const dynamic = 'force-dynamic'
