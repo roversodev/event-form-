@@ -121,7 +121,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8 p-6 bg-card rounded-xl shadow-sm border">
         <div className="text-center">
-        <h1 className="mb-1 mt-4 text-xl font-semibold">Entrar em <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">EventFlow+</span></h1>
+        <h1 className="mb-1 mt-4 text-xl font-semibold">Entrar em <span className="bg-gradient-to-r from-primary to-purple-600 bg-clip-text text-transparent">EventForm+</span></h1>
           <p className="text-muted-foreground ">
             Acesse sua conta para gerenciar seus formulários
           </p>

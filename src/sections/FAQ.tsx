@@ -8,18 +8,18 @@ import {
 const faqItems = [
   {
     id: 'item-1',
-    question: 'Como começar a usar o EventFlow+?',
+    question: 'Como começar a usar o EventForm+?',
     answer: 'Basta criar uma conta gratuita e você já pode começar a criar seu primeiro evento.'
   },
   {
     id: 'item-2',
-    question: 'Quanto custa usar o EventFlow+?',
+    question: 'Quanto custa usar o EventForm+?',
     answer: 'Oferecemos um plano gratuito com recursos essenciais. Para funcionalidades avançadas, temos planos premium a partir de R$49/mês.'
   },
   {
     id: 'item-3',
     question: 'Posso personalizar os formulários?',
-    answer: 'Sim! O EventFlow+ oferece total flexibilidade para personalizar seus formulários e páginas de evento com sua marca.'
+    answer: 'Sim! O EventForm+ oferece total flexibilidade para personalizar seus formulários e páginas de evento com sua marca.'
   },
   {
     id: 'item-4',

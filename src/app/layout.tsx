@@ -12,8 +12,8 @@ import { SupportButton } from "@/components/SupportButton";
 const dmSans = DM_Sans({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
-  description: "Simplifique a gestão dos seus eventos com o EventFlow+. Sistema completo com formulários personalizados, check-in digital, dashboard em tempo real e gestão de convidados. A solução moderna para organizadores de eventos.",
+  title: "EventForm+ | Plataforma Completa de Gestão de Eventos e Check-in",
+  description: "Simplifique a gestão dos seus eventos com o EventForm+. Sistema completo com formulários personalizados, check-in digital, dashboard em tempo real e gestão de convidados. A solução moderna para organizadores de eventos.",
   keywords: "gestão de eventos, check-in digital, sistema de eventos, formulários para eventos, gerenciamento de convidados, plataforma de eventos, controle de presença, dashboard de eventos, inscrições online, organização de eventos, RSVP online, lista de convidados digital",
   authors: [{ name: "RoversoDev" }],
   icons: {
@@ -22,31 +22,31 @@ export const metadata: Metadata = {
     apple: "/favicon.png",
   },
   openGraph: {
-    title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
+    title: "EventForm+ | Plataforma Completa de Gestão de Eventos e Check-in",
     description: "Transforme a gestão dos seus eventos com formulários personalizados, check-in digital e análises em tempo real. A solução completa para organizadores de eventos modernos.",
     type: "website",
     locale: "pt_BR",
     images: [{
-      url: "https://eventflow.roversodev.com.br/dashboard.png",
+      url: "https://eventform.roversodev.com.br/dashboard.png",
       width: 1200,
       height: 630,
-      alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
+      alt: "EventForm+ - Plataforma Moderna de Gestão de Eventos"
     }]
   },
   twitter: {
     card: "summary_large_image",
-    title: "EventFlow+ | Plataforma Completa de Gestão de Eventos e Check-in",
+    title: "EventForm+ | Plataforma Completa de Gestão de Eventos e Check-in",
     description: "Transforme a gestão dos seus eventos com formulários personalizados, check-in digital e análises em tempo real. A solução completa para organizadores de eventos modernos.",
     images: [{
-      url: "https://eventflow.roversodev.com.br/dashboard.png",
+      url: "https://eventform.roversodev.com.br/dashboard.png",
       width: 1200,
       height: 630,
-      alt: "EventFlow+ - Plataforma Moderna de Gestão de Eventos"
+      alt: "EventForm+ - Plataforma Moderna de Gestão de Eventos"
     }]
   },
   robots: "index, follow",
   alternates: {
-    canonical: "https://eventflow.roversodev.com.br"
+    canonical: "https://eventform.roversodev.com.br"
   }
 };
 

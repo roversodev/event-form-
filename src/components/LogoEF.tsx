@@ -22,7 +22,7 @@ const LogoEF = (props: { url?: string; }) => {
                     F
                 </div>
                 <span className="text-2xl font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent bg-[length:200%_auto] hover:bg-right transition-all duration-500">
-                    EventFlow+
+                    EventForm+
                 </span>
             </Link>
         </div>

@@ -125,7 +125,7 @@ export const SkeletonOne = () => {
           <div className="relative w-full max-h-[400px] overflow-hidden rounded-lg">
             <img
               src="/localhost.jpeg"
-              alt="Dashboard do EventFlow+"
+              alt="Dashboard do EventForm+"
               width={800}
               height={800}
               className="w-full object-cover object-center rounded-lg"
