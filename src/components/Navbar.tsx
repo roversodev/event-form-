@@ -126,7 +126,7 @@ const Navbar = () => {
                 <SheetContent side="right" className="w-full sm:w-[350px] p-0">
                   <SheetHeader className="p-6 border-b">
                     <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
-                      EventFlow+
+                      EventForm+
                     </SheetTitle>
                     <ThemeToggleButton variant="circle" start="top-left" />
                   </SheetHeader>

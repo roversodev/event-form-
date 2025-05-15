@@ -29,9 +29,9 @@ export async function POST(request: Request) {
     }));
 
     await resend.emails.send({
-      from: 'EventFlow+ <contato@roversodev.com.br>',
+      from: 'EventForm+ <contato@roversodev.com.br>',
       to: [to],
-      subject: `[Suporte EventFlow+] ${subject}`,
+      subject: `[Suporte EventForm+] ${subject}`,
       html: emailHtml,
     });
 

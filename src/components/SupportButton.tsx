@@ -65,7 +65,7 @@ export function SupportButton() {
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className='font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent'>Suporte EventFlow+</DialogTitle>
+          <DialogTitle className='font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent'>Suporte EventForm+</DialogTitle>
           <DialogDescription>
             Envie sua mensagem para nossa equipe de suporte. Responderemos o mais breve possível!
           </DialogDescription>

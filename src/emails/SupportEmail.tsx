@@ -25,10 +25,10 @@ export const SupportEmail: React.FC<SupportEmailProps> = ({
   return (
     <Html>
       <Head />
-      <Preview>Nova mensagem de suporte do EventFlow+</Preview>
+      <Preview>Nova mensagem de suporte do EventForm+</Preview>
       <Body style={main}>
         <Container style={container}>
-          <Text style={logo}>EventFlow+</Text>
+          <Text style={logo}>EventForm+</Text>
           <Text style={paragraph}>Nova mensagem de suporte recebida:</Text>
           
           <Text style={paragraph}>
@@ -46,22 +46,22 @@ export const SupportEmail: React.FC<SupportEmailProps> = ({
           <Section style={btnContainer}>
             <Button 
               style={button} 
-              href="https://eventflow.roversodev.com.br"
+              href="https://eventform.roversodev.com.br"
             >
-              Acessar EventFlow+
+              Acessar EventForm+
             </Button>
           </Section>
 
           <Text style={paragraph}>
             Atenciosamente,
             <br />
-            Equipe EventFlow+
+            Equipe EventForm+
           </Text>
 
           <Hr style={hr} />
           
           <Text style={footer}>
-            Este e-mail foi enviado através do sistema de suporte do EventFlow+.
+            Este e-mail foi enviado através do sistema de suporte do EventForm+.
             Para responder, simplesmente responda a este e-mail.
           </Text>
         </Container>

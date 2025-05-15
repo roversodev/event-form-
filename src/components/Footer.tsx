@@ -76,7 +76,7 @@ const Footer = () => {
                 {/* Copyright e Créditos */}
                 <div className="flex flex-col sm:flex-row items-center justify-between text-sm text-muted-foreground">
                     <p className="flex items-center gap-1 mb-4 sm:mb-0">
-                        <span>© 2025 EventFlow+</span>
+                        <span>© 2025 EventForm+</span>
                         <span className="inline-flex items-center">
                             feito com <Heart className="h-4 w-4 fill-primary mx-1" /> por
                         </span>
