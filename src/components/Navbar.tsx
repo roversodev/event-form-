@@ -75,7 +75,7 @@ const Navbar = () => {
 
             {/* Links de Navegação - Desktop */}
             <div className="hidden md:flex items-center gap-6">
-              {navItems.map((item) => (
+              {user && navItems.map((item) => (
                 <Link
                   key={item.href}
                   href={item.href}
@@ -121,55 +121,55 @@ const Navbar = () => {
               )}
             </div>
 
-              {/* Menu Mobile */}
-          <div className="md:hidden">
-            <Sheet>
-              <SheetTrigger asChild>
-                <Button variant="ghost" size="icon">
-                  <Menu className="h-6 w-6" />
-                </Button>
-              </SheetTrigger>
-              <SheetContent side="right" className="w-full sm:w-[350px] p-0">
-                <SheetHeader className="p-6 border-b">
-                  <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
-                    EventFlow+
-                  </SheetTitle>
-                  <ThemeToggleButton variant="circle" start="top-left" />
-                </SheetHeader>
-                <div className="flex flex-col px-6 py-4 space-y-4">
-                  {navItems.map((item) => (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
-                    >
-                      {item.label}
-                    </Link>
-                  ))}
-                  
-                  {!user && (
-                    <Link href="/login" className="mt-4">
-                      <Button className="w-full" size="lg">
-                        Entrar
-                      </Button>
-                    </Link>
-                  )}
+            {/* Menu Mobile */}
+            <div className="md:hidden">
+              <Sheet>
+                <SheetTrigger asChild>
+                  <Button variant="ghost" size="icon">
+                    <Menu className="h-6 w-6" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-full sm:w-[350px] p-0">
+                  <SheetHeader className="p-6 border-b">
+                    <SheetTitle className="text-2xl font-bold bg-gradient-to-r from-primary via-purple-600 to-primary bg-clip-text text-transparent">
+                      EventFlow+
+                    </SheetTitle>
+                    <ThemeToggleButton variant="circle" start="top-left" />
+                  </SheetHeader>
+                  <div className="flex flex-col px-6 py-4 space-y-4">
+                    {user && navItems.map((item) => (
+                      <Link
+                        key={item.href}
+                        href={item.href}
+                        className="text-lg font-medium text-foreground hover:text-primary transition-colors py-2"
+                      >
+                        {item.label}
+                      </Link>
+                    ))}
+                    
+                    {!user && (
+                      <Link href="/login" className="mt-4">
+                        <Button className="w-full" size="lg">
+                          Entrar
+                        </Button>
+                      </Link>
+                    )}
 
-                  {user && (
-                    <div className="mt-4 pt-4 border-t">
-                      <ProfileUser 
-                        name={user.user_metadata.name} 
-                        role={user.email} 
-                        subscription="Free" 
-                        actionLogout={handleSignOut}
-                        avatar={user.user_metadata.picture}
-                      />
-                    </div>
-                  )}
-                </div>
-              </SheetContent>
-            </Sheet>
-          </div>
+                    {user && (
+                      <div className="mt-4 pt-4 border-t">
+                        <ProfileUser 
+                          name={user.user_metadata.name} 
+                          role={user.email} 
+                          subscription="Free" 
+                          actionLogout={handleSignOut}
+                          avatar={user.user_metadata.picture}
+                        />
+                      </div>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            </div>
           </div>
         </div>
       </nav>
