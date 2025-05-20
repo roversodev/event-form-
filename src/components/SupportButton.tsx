@@ -37,7 +37,7 @@ export function SupportButton() {
         body: JSON.stringify({
           subject,
           message,
-          to: 'roversodev@gmail.com'
+          to: 'contato@roversodev.com.br'
         }),
       });
 
