@@ -15,10 +15,12 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { toast } from 'sonner';
 import { Loader2, HelpCircle } from 'lucide-react';
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs';
 
 export function SupportButton() {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const supabase = createClientComponentClient();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -29,6 +31,13 @@ export function SupportButton() {
     const message = formData.get('message');
 
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast.error('Você precisa estar logado para enviar mensagens.');
+        return;
+      }
+
       const response = await fetch('/api/support', {
         method: 'POST',
         headers: {
@@ -37,7 +46,8 @@ export function SupportButton() {
         body: JSON.stringify({
           subject,
           message,
-          to: 'contato@roversodev.com.br'
+          to: 'contato@roversodev.com.br',
+          userId: user.id,
         }),
       });
 
