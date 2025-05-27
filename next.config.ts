@@ -5,7 +5,20 @@ const nextConfig: NextConfig = {
     ignoreDuringBuilds: true,
   },
   images: {
-    domains: ['ferf1mheo22r9ira.public.blob.vercel-storage.com', 'nqjhakjqagqhietnttqq.supabase.co', 'lh3.googleusercontent.com']
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'ferf1mheo22r9ira.public.blob.vercel-storage.com'
+      },
+      {
+        protocol: 'https',
+        hostname: 'nqjhakjqagqhietnttqq.supabase.co'
+      },
+      {
+        protocol: 'https',
+        hostname: 'lh3.googleusercontent.com'
+      }
+    ]
   }
 };
 
