@@ -246,7 +246,7 @@ export default function EventForm() {
               <h1 className="text-3xl font-bold mb-2">
                 {event.title}
               </h1>
-              <div className="text-muted-foreground">
+              <div className="text-white">
                 <TextFormatter text={event.description} />
               </div>
             </div>
