@@ -12,7 +12,7 @@ import { toast } from 'sonner';
 import { useSupabase } from '@/providers/SupabaseProvider';
 import type { User } from '@supabase/supabase-js';
 import { v4 as uuidv4 } from 'uuid';
-
+import { TextAreaWithPreview } from '@/components/TextAreaWithPreview';
 
 type FieldType = 'text' | 'email' | 'number' | 'phone' | 'date' | 'select' | 'checkbox' | 'radio' | 'textarea';
 
@@ -391,11 +391,11 @@ const NewEvent = () => {
                 <label htmlFor="eventDescription" className="block text-sm font-medium mb-1">
                   Descrição do Evento
                 </label>
-                <Textarea 
-                  id="eventDescription" 
+                <TextAreaWithPreview 
+                  id="eventDescription"
                   value={eventDescription}
-                  onChange={(e) => setEventDescription(e.target.value)}
-                  placeholder="Descreva seu evento em poucas palavras..." 
+                  onChange={(e) => setEventDescription(e)}
+                  placeholder="Descreva seu evento em poucas palavras..."
                   rows={4}
                 />
               </div>

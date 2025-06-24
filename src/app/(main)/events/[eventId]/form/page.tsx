@@ -14,6 +14,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
+import { TextFormatter } from '@/components/TextFormatter';
 
 interface FormField {
   id: string;
@@ -245,7 +246,9 @@ export default function EventForm() {
               <h1 className="text-3xl font-bold mb-2">
                 {event.title}
               </h1>
-              <p className="text-muted-foreground">{event.description}</p>
+              <div className="text-muted-foreground">
+                <TextFormatter text={event.description} />
+              </div>
             </div>
           </div>
 
